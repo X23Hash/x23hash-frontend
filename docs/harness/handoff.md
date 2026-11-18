@@ -3,8 +3,9 @@
 ## 서비스 이름 변경(ToMyX → *23#, x23hash) — 2026-11-18
 
 - 코드·설정·CI·문서 변경을 develop에 반영했고 첫 Cloudflare 배포(`https://develop.x23hash.pages.dev`)가 성공했습니다. main에는 아직 반영하지 않았습니다. 범위·결정·검증은 [서비스 이름 변경](../specs/rebrand-x23hash.md)을 따릅니다. 웹은 Cloudflare Pages(`x23hash.pages.dev`)로 옮겼고 식별자는 `com.x23hash.*`, Expo 조직은 `x23hash`, 프로젝트 slug는 `to-my-x` 그대로입니다.
-- 로컬 검증만 통과한 상태입니다(lint·타입·단위 테스트 22개, prebuild 식별자·표시 이름, Cloudflare 로컬 에뮬레이터의 동적 주소). 새 식별자의 네이티브 빌드·제출·설치와 웹의 실서버 데이터·로그인 확인은 실행하지 않았습니다.
-- main에 반영하기 전에 새 식별자의 서명·제출 자격증명과 첫 AAB 수동 업로드가 필요합니다. 준비 전에 반영하면 `app-test` 작업이 실패합니다([앱 테스트 자동화](../specs/app-test-automation.md)의 2026-11-18 기록).
+- 로컬 검증만 통과한 상태입니다(lint·타입·단위 테스트 22개, prebuild 식별자·표시 이름, Cloudflare 로컬 에뮬레이터의 동적 주소). 웹의 실서버 데이터·로그인 확인은 실행하지 않았습니다.
+- 새 앱 첫 빌드(develop `facb5db`, `testing` 프로필): iOS `ce934ee0` 성공 후 TestFlight 업로드 성공(Apple 처리·설치 미확인), Android `a7f056e7` 성공(Play 제출 없음, 첫 AAB는 사용자가 수동 업로드). iOS 서명은 새 Apple 팀 `R4PW5MSL4D`이며, 이 프로젝트의 자격증명 설정에서는 본인 Apple ID로 로그인하지 않고 `EXPO_ASC_*` 환경 변수로 API 키 인증을 씁니다. 설치·실행과 카카오 로그인은 두 플랫폼 모두 미확인입니다.
+- main에 반영하기 전에 첫 AAB 수동 업로드와 Play 서비스 계정의 새 앱 권한이 필요합니다. 준비 전에 반영하면 `app-test` 작업이 실패합니다([앱 테스트 자동화](../specs/app-test-automation.md)의 2026-11-18 기록).
 - 외부 대기: 서버 CORS(새 웹 주소, 2026-11-18 조회 시 403), develop 미리보기 주소의 카카오·CORS 등록, 카카오 기본 키의 패키지·번들 ID 교체(새 빌드 테스트 시점), `*23#` 읽는 법 확인(탈퇴 문구 조사).
 
 ## 하단 토글 고정 탭바 전환 — 2026-11-08

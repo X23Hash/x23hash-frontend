@@ -60,7 +60,7 @@ Settings → Secrets and variables → Actions에서 설정합니다. 비밀값�
 ### Cloudflare Pages
 
 - Pages 프로젝트 `x23hash`는 Direct Upload 방식입니다. 빌드는 Actions가 하고 결과물 `dist`만 `npx wrangler@4 pages deploy dist --project-name x23hash --branch <브랜치>`로 올립니다. Direct Upload 프로젝트는 Git 연동으로 바꿀 수 없으므로 대시보드에서 저장소를 연결하지 않습니다.
-- 배포 브랜치가 프로젝트의 프로덕션 브랜치와 같으면 `x23hash.pages.dev`, 다르면 `<브랜치>.x23hash.pages.dev` 미리보기로 올라갑니다. 프로덕션 브랜치가 `main`인지는 첫 main 배포의 출력 주소로 확인합니다.
+- 배포 브랜치가 프로젝트의 프로덕션 브랜치와 같으면 `x23hash.pages.dev`, 다르면 `<브랜치>.x23hash.pages.dev` 미리보기로 올라갑니다. 프로덕션 브랜치는 `main`입니다(프로젝트를 `wrangler pages project create x23hash --production-branch main`으로 만든 사용자 터미널 기록, 2026-11-18).
 - 동적 라우트는 `public/_redirects`의 재작성 규칙으로 정적 파일에 연결합니다(`/stories/:id` → `stories/[id].html`, `/legal/:kind` → `legal/[kind].html`). 동적 라우트를 추가하면 이 파일에도 한 줄을 추가합니다.
 - `build:web`이 `+not-found.html`을 `404.html`로 복사합니다. 최상위 `404.html`이 없으면 Pages가 없는 주소에도 첫 화면을 200으로 내려줍니다.
 - 카카오 Redirect URI와 서버 CORS에는 프로덕션·develop 미리보기 주소를 모두 등록해야 합니다. 값은 [계정 스펙](account-access.md)의 2026-11-18 기록을 따릅니다.
