@@ -1,7 +1,7 @@
 // 로그인 전(게스트) 숨긴 글 저장. 서버 정책: 게스트 숨김은 브라우저에 저장하고
 // 프론트가 피드에서 걸러낸 뒤, 로그인 직후 계정 숨김에 합칩니다.
 // localStorage가 없는 네이티브 게스트는 앱 실행 동안만 메모리에 유지합니다.
-const key = "tomyx.hidden.v1";
+const key = "x23hash.hidden.v1";
 let memory: string[] = [];
 
 type WebStorage = {

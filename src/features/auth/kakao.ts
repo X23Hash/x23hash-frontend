@@ -23,7 +23,7 @@ export function kakaoRedirectUri() {
 export const kakaoWebReady = () =>
   Boolean(kakaoClientId && web.location && web.sessionStorage);
 
-const stateKey = "tomyx.kakao.state";
+const stateKey = "x23hash.kakao.state";
 
 // 인가 요청 URL을 만들고, 복귀 검증용 state(난수 + next 키)를 세션에 보관합니다.
 export function buildKakaoAuthorizeUrl(next?: string) {

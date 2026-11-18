@@ -1,15 +1,15 @@
 {
   "expo": {
-    "name": "to-my-x",
+    "name": "x23hash",
     "slug": "to-my-x",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "tomyx",
+    "scheme": "x23hash",
     "userInterfaceStyle": "automatic",
     "ios": {
       "icon": "./assets/expo.icon",
-      "bundleIdentifier": "com.tomyx.ios",
+      "bundleIdentifier": "com.x23hash.ios",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
@@ -22,7 +22,7 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "com.tomyx.android"
+      "package": "com.x23hash.android"
     },
     "web": {
       "output": "static",
@@ -63,7 +63,8 @@
           }
         }
       ],
-      "expo-secure-store"
+      "expo-secure-store",
+      ["./plugins/with-display-name", "*23#"]
     ],
     "experiments": {
       "typedRoutes": true,
@@ -75,7 +76,7 @@
         "projectId": "2661f041-a390-4276-8689-8b210845db86"
       }
     },
-    "owner": "to-my-x",
+    "owner": "x23hash",
     "runtimeVersion": {
       "policy": "fingerprint"
     },

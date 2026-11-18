@@ -6,7 +6,7 @@ export type PendingIntent = {
   postId: string;
 };
 
-const key = "tomyx.intent.v1";
+const key = "x23hash.intent.v1";
 let memory: PendingIntent | null = null;
 
 type WebStorage = {

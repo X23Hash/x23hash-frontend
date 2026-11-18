@@ -1,6 +1,6 @@
 ---
 name: app-release
-description: ToMyX 앱 릴리스 요청 시 EAS로 Android·iOS 앱을 빌드하고 요청 범위에 따라 Google Play 내부 테스트·TestFlight에 제출한다. 앱 개발용 빌드나 내부 배포 요청에도 사용한다. 프로덕션 OTA·공개 배포는 명시적 요청 시에만 수행하며, CI의 테스트 자동화 설정은 별도 명세를 따른다.
+description: x23hash 앱 릴리스 요청 시 EAS로 Android·iOS 앱을 빌드하고 요청 범위에 따라 Google Play 내부 테스트·TestFlight에 제출한다. 앱 개발용 빌드나 내부 배포 요청에도 사용한다. 프로덕션 OTA·공개 배포는 명시적 요청 시에만 수행하며, CI의 테스트 자동화 설정은 별도 명세를 따른다.
 ---
 
 # 앱 빌드와 배포
@@ -32,7 +32,7 @@ description: ToMyX 앱 릴리스 요청 시 EAS로 Android·iOS 앱을 빌드하
 1. `git status --short --branch`와 관련 diff로 소스 상태를 확인하고 실제 대상 커밋 SHA를 기록합니다. main 릴리스 요청을 현재 develop 코드로 실행하지 않습니다. 필요한 경우 별도 작업 폴더를 사용해 기존 작업을 보존합니다. 미커밋 변경을 임의로 커밋·삭제하거나 사용자 지시 없이 다른 작업까지 릴리스하지 않습니다.
 2. [문서 동기화 리뷰](../documentation-review/SKILL.md)를 수행하고 lint·타입 검사를 실행합니다. 정책 충돌·검사 실패를 해결하기 전에는 빌드하지 않습니다. 앱 코드·네이티브 변경이면 필요한 플랫폼 검증과 미검증 범위도 확인합니다.
 3. `package.json`의 Expo 버전, 해당 버전 공식 문서와 `https://docs.expo.dev/llms.txt`의 Build·Submit 안내를 확인합니다. CLI 도움말로 필요한 옵션을 확인합니다. npm 프로젝트에서는 `npx eas-cli@latest`를 사용합니다.
-4. `npx eas-cli@latest whoami`로 인증 상태를 확인하고 app.json의 owner·projectId·패키지 ID가 ToMyX인지 확인합니다. 토큰·비밀키를 출력하거나 문서에 남기지 않습니다.
+4. `npx eas-cli@latest whoami`로 인증 상태를 확인하고 app.json의 owner(`x23hash`)·projectId·패키지 ID(`com.x23hash.android`·`com.x23hash.ios`)가 맞는지 확인합니다. 토큰·비밀키를 출력하거나 문서에 남기지 않습니다.
 5. 요청한 프로필·플랫폼의 서명 자격증명이 EAS에 준비됐는지 확인합니다. iOS 실기기 내부 배포는 기기 등록과 유효한 프로비저닝 프로필이 필요합니다. 새 기기를 추가했다면 프로필 갱신도 확인합니다.
 6. 제출까지 요청한 경우 빌드 비용이 발생하기 전에 준비 상태를 확인합니다. Android는 Play 앱·첫 수동 업로드·EAS에 저장한 Google 서비스 계정, iOS는 App Store Connect 앱·API key·숫자 ascAppId가 필요합니다. iOS 앱 ID는 확인된 값을 `eas.json`의 `submit.production.ios.ascAppId`에 기록합니다. GitHub 변수는 로컬 스킬에 자동 전달되지 않습니다.
 

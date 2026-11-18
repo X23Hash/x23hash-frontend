@@ -1,6 +1,6 @@
 # 에이전트 작업 지침
 
-이 파일은 Claude Code와 Codex가 ToMyX에서 함께 사용하는 행동 원칙과 프로젝트 가이드입니다. `CLAUDE.md`는 이 파일을 참조하며, 공통 규칙을 따로 복제하지 않습니다.
+이 파일은 Claude Code와 Codex가 x23hash(서비스 이름 `*23#`, 구 ToMyX)에서 함께 사용하는 행동 원칙과 프로젝트 가이드입니다. `CLAUDE.md`는 이 파일을 참조하며, 공통 규칙을 따로 복제하지 않습니다.
 
 이 프로젝트는 Spec Driven Development(SDD) 방식으로 개발합니다. 하네스 엔지니어링을 적용해 에이전트가 바뀌어도 명세, 결정 근거, 검증 결과를 저장소에서 확인하고 작업을 이어갈 수 있도록 합니다.
 
@@ -77,7 +77,7 @@
 
 ## 프로젝트 개요
 
-ToMyX는 TypeScript, React Native, Expo, Expo Router를 사용하는 프로젝트입니다. 웹을 먼저 출시하고 Android와 iOS로 확장할 계획입니다.
+x23hash(서비스 이름 `*23#`)는 TypeScript, React Native, Expo, Expo Router를 사용하는 프로젝트입니다. 웹을 먼저 출시하고 Android와 iOS로 확장할 계획입니다.
 
 - 모바일 화면에 맞는 UI를 구현하되, 웹 동작과 성능도 확인합니다.
 - 플랫폼 간 공유를 우선하고, 플랫폼별 동작이 다르면 필요한 부분만 분리합니다.

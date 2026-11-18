@@ -36,7 +36,7 @@ test("게시글 ID 기준 배경 배정은 같은 글에 항상 같은 배경을
     publishedAt: "2026-11-07T00:00:00Z",
     visibility: "PUBLIC",
     isMine: false,
-    shareUrl: "https://to-my-x.expo.app/stories/p1",
+    shareUrl: "https://x23hash.pages.dev/stories/p1",
     reactionCount: 3,
     reacted: true,
   });
@@ -51,7 +51,7 @@ test("게스트 숨김 저장은 중복 없이 쌓이고 손상값을 무시한�
   hidden.addHidden("b");
   hidden.addHidden("a");
   assert.deepEqual(hidden.loadHidden(), ["a", "b"]);
-  const storage = new Map([["tomyx.hidden.v1", "{broken"]]);
+  const storage = new Map([["x23hash.hidden.v1", "{broken"]]);
   globalThis.localStorage = {
     getItem: (key) => storage.get(key) ?? null,
     setItem: (key, value) => storage.set(key, value),
@@ -76,7 +76,7 @@ test("복귀 의도는 한 번만 소비되고 위조값은 거부한다", () =>
     postId: "p9",
   });
   assert.equal(intent.consumePendingIntent(), null);
-  storage.set("tomyx.intent.v1", JSON.stringify({ type: "evil", postId: 1 }));
+  storage.set("x23hash.intent.v1", JSON.stringify({ type: "evil", postId: 1 }));
   assert.equal(intent.consumePendingIntent(), null);
 });
 

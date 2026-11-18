@@ -42,7 +42,7 @@ export function MyScreen({
 }) {
   return (
     <FlowPage
-      title="To My X"
+      title="*23#"
       right={!guest && <ActionButton label="설정" onPress={onSettings} />}
       // 하단 고정 바(탭 레이아웃)가 콘텐츠를 가리지 않도록 자리를 비워둡니다.
       footer={<View style={styles.barSpace} />}

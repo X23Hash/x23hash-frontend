@@ -13,7 +13,7 @@ export type OnboardingProgress = {
   done: boolean;
 };
 
-const key = "tomyx.onboarding.v1";
+const key = "x23hash.onboarding.v1";
 let memory: string | null = null;
 
 type WebStorage = { getItem: (key: string) => string | null; setItem: (key: string, value: string) => void };

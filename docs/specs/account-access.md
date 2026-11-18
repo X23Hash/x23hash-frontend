@@ -192,7 +192,7 @@
 서버 `https://api-tomyx.rhkr8521.com`(/api/v1/auth)와 카카오 웹 로그인을 연동했습니다.
 
 - 웹(08.01~03): 카카오 인가 코드 플로우. `scope=openid` 포함 인가 요청 → `/login` 콜백의 `code`를 `POST /api/v1/auth/login/kakao/code`로 교환합니다. state는 난수+복귀 키로 만들어 sessionStorage 보관값과 대조하고, 불일치는 실패(08.05)로 처리합니다. 성공 응답의 `newMember` 또는 이 기기의 동의 기록 부재 시 08.06 동의로 보냅니다.
-- 세션: access 토큰은 메모리, refresh 토큰·memberId·동의 여부는 `tomyx.auth.v1`(웹 localStorage, 네이티브는 expo-secure-store — iOS Keychain·Android Keystore 암호화 저장)에 보존해 앱 재시작 후에도 로그인을 유지합니다(2026-10-30). refresh 토큰은 자격 증명이라 일반 저장소 대신 보안 저장소를 사용하며, 저장 실패 시 해당 실행 동안만 메모리로 유지합니다. 네이티브 모듈 추가라 다음 main 머지는 OTA가 아닌 새 바이너리 빌드로 배포됩니다.
+- 세션: access 토큰은 메모리, refresh 토큰·memberId·동의 여부는 `x23hash.auth.v1`(2026-11-18 이름 변경 전 `tomyx.auth.v1`, 웹 localStorage, 네이티브는 expo-secure-store — iOS Keychain·Android Keystore 암호화 저장)에 보존해 앱 재시작 후에도 로그인을 유지합니다(2026-10-30). refresh 토큰은 자격 증명이라 일반 저장소 대신 보안 저장소를 사용하며, 저장 실패 시 해당 실행 동안만 메모리로 유지합니다. 네이티브 모듈 추가라 다음 main 머지는 OTA가 아닌 새 바이너리 빌드로 배포됩니다.
 - 동의 직후 세션 초기화 버그 수정(2026-10-30): 동의 화면의 이탈 취소 effect가 `cancelPending`을 의존성으로 가져, 동의로 상태가 바뀔 때마다 이전 렌더의 클로저가 cleanup으로 실행돼 방금 로그인한 세션을 `reset()`으로 지우고 로그인 시트로 되돌렸습니다(첫 동의를 거치는 모든 신규 로그인에서 재현, 사용자 보고). 언마운트 시에만 취소하고 동의·취소로 끝난 경우는 건너뛰도록 수정했습니다. iOS 시뮬레이터에서 로그인→동의→글쓰기 복귀, 강제 종료→재시작→세션 복원(로그인 라우트 즉시 통과)을 확인했습니다. 앱 시작 시 refresh 회전(`POST /token/refresh`)으로 복원하고 실패하면 게스트로 시작합니다. 사용한 refresh 토큰은 재사용되지 않으므로 회전 결과를 항상 저장합니다.
 - 로그아웃(09.04)·동의 전 이탈: `POST /logout`으로 토큰 계열을 폐기(실패해도 로컬 정리 유지)하고 게스트로 돌아갑니다.
 - 08.04 진행 중·08.05 실패 상태를 로그인 시트에 구현했습니다. Apple·Google은 공급자 설정 전 비활성입니다.
@@ -218,3 +218,13 @@
 - 탈퇴(09.05/09.06): POST `/me/withdrawal`에 클라이언트 생성 operationId를 보내고 재시도에도 같은 ID를 씁니다. 네트워크 유실 시 GET `/account-deletions/{operationId}`로 결과를 확인해 완료/미탈퇴(404 ACCOUNT4041, 같은 ID 재요청)를 구분합니다. 서버 확인 후에만 완료 화면을 표시하고 로컬 세션을 정리합니다.
 - mock 로그인은 서버 호출 없이 화면 연결만 유지합니다(동의도 로컬 전이).
 - 검증: iOS 시뮬레이터에서 로그인→서버 약관 v0.1 동의→토큰 재발급→MY/글 등록/알림/설정/약관 문서를 실서버로 확인. 탈퇴는 실행하지 않았습니다(실계정 삭제 방지). lint·타입·단위 테스트 22개 통과.
+
+## 서비스 이름 변경에 따른 등록값 — 2026-11-18
+
+[서비스 이름 변경](rebrand-x23hash.md)으로 식별자와 주소가 바뀌었습니다. 위 2026-10-28·10-30 기록의 옛 값은 이력으로 남기고, 현재 값은 아래를 따릅니다.
+
+- 저장 키: `x23hash.auth.v1`, `x23hash.kakao.state`. 웹은 주소가 바뀌어 저장소가 비고 앱은 새로 설치되므로 옛 키의 값은 옮기지 않습니다. 기존 사용자는 한 번 다시 로그인합니다.
+- 카카오 Redirect URI: `https://x23hash.pages.dev/login`(프로덕션), `https://develop.x23hash.pages.dev/login`(develop 미리보기), `http://localhost:8081/login`. 카카오는 로그인을 마친 뒤 주소를 검사하므로 등록 여부는 실제 웹 로그인으로만 확인됩니다.
+- 서버 CORS 허용 Origin: `https://x23hash.pages.dev`, `https://develop.x23hash.pages.dev`. 2026-11-18 조회 시 `https://x23hash.pages.dev`의 preflight가 403으로 거부돼 서버 반영 대기 중입니다.
+- 카카오 네이티브 앱 키는 기존 기본 키를 그대로 쓰고, 키에 등록된 Android 패키지를 `com.x23hash.android`, iOS 번들 ID를 `com.x23hash.ios`로 교체합니다(키 하나에 패키지 1개만 등록 가능). 교체하면 옛 식별자 앱의 카카오 로그인이 막히므로 새 식별자 빌드를 테스트하는 시점에 교체합니다.
+- Android 키 해시: 새 패키지는 EAS 업로드 키와 Play 앱 서명 키가 새로 만들어지므로 두 해시를 새로 등록합니다. 디버그 키 해시는 같은 개발 PC면 그대로입니다.

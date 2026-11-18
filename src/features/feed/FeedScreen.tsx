@@ -187,7 +187,7 @@ export function FeedScreen({
           pointerEvents="box-none"
           style={[styles.header, { top: insets.top + 22 }]}
         >
-          <Text style={styles.brand}>To My X</Text>
+          <Text style={styles.brand}>*23#</Text>
           {!hidden && (
             <View style={styles.bell}>
               <IconButton

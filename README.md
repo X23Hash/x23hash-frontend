@@ -1,4 +1,4 @@
-# to-my-x-frontend
+# x23hash-frontend
 
 ## 프로젝트 문서
 
