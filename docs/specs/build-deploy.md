@@ -110,7 +110,8 @@ Submit 성공은 공개 완료가 아닙니다. Google Play 초기 설정·검�
 | develop 웹 배포 성공 | Actions 38521762369 | 통과 |
 | main 웹 배포·앱 빌드·제출 | 각 대상의 실제 실행 | 미실행 |
 | Cloudflare Pages 동적 주소·404 응답 | `wrangler pages dev dist` 로컬 에뮬레이터 | 통과(2026-11-18) |
-| Cloudflare Pages 실제 배포 | develop·main push의 Actions 실행 | 미실행 |
+| Cloudflare Pages develop 배포 | Actions 44252478283, `https://develop.x23hash.pages.dev` 응답 조회 | 통과(2026-11-18). `/`·`/stories/123`·`/legal/terms` 200, 없는 주소 404 |
+| Cloudflare Pages main 배포 | main push의 Actions 실행 | 미실행. `x23hash.pages.dev`는 아직 배포가 없어 404 |
 
 ## 변경 기록
 
