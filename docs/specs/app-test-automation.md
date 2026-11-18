@@ -76,4 +76,5 @@
 - 새 식별자에는 서명·제출 자격증명이 없습니다. Android 업로드 키, iOS 배포 인증서·프로비저닝(새 Apple 팀), App Store Connect API 키, Play 서비스 계정의 새 앱 권한을 먼저 준비하고 첫 AAB를 수동 업로드해야 자동 제출이 성공합니다. 준비 전에 main에 반영하면 `app-test` 작업이 실패하므로 그 전까지는 `APP_TEST_ENABLED`를 끄거나 실패를 감수합니다.
 - 식별자 변경으로 fingerprint가 달라져 성공 기준 태그 `app-test-android`·`app-test-ios`가 남아 있어도 첫 실행은 OTA가 아닌 빌드·제출로 진행됩니다. 태그는 삭제하지 않습니다.
 - iOS 앱 ID는 `6836202739`로 `eas.json`에 반영했습니다.
-- 새 앱의 빌드·제출·설치는 미실행입니다.
+- 2026-11-18 준비 완료: iOS 배포 인증서·프로비저닝(새 팀 `R4PW5MSL4D`)과 제출용 API 키, Android 키스토어와 Play 서비스 계정 키 연결·새 앱 권한, 첫 AAB 수동 업로드를 마쳤습니다. 로컬에서 실행한 `testing` 빌드와 제출이 두 플랫폼 모두 성공했습니다(iOS `ce934ee0` → TestFlight, Android `1144ffd0` → Play 내부 테스트). 빌드 ID와 과정은 [서비스 이름 변경](rebrand-x23hash.md)의 기록을 따릅니다.
+- CI(`app-test` 작업)에서의 새 앱 빌드·제출과 설치·실행은 미확인입니다.

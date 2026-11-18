@@ -228,3 +228,4 @@
 - 서버 CORS 허용 Origin: `https://x23hash.pages.dev`, `https://develop.x23hash.pages.dev`. 2026-11-18 조회 시 `https://x23hash.pages.dev`의 preflight가 403으로 거부돼 서버 반영 대기 중입니다.
 - 카카오 네이티브 앱 키는 기존 기본 키를 그대로 쓰고, 키에 등록된 Android 패키지를 `com.x23hash.android`, iOS 번들 ID를 `com.x23hash.ios`로 교체합니다(키 하나에 패키지 1개만 등록 가능). 교체하면 옛 식별자 앱의 카카오 로그인이 막히므로 새 식별자 빌드를 테스트하는 시점에 교체합니다.
 - Android 키 해시: 새 패키지는 EAS 업로드 키와 Play 앱 서명 키가 새로 만들어지므로 두 해시를 새로 등록합니다. 디버그 키 해시는 같은 개발 PC면 그대로입니다.
+- 새 패키지 `com.x23hash.android`의 키 해시(2026-11-18, Play Console 앱 무결성의 SHA-1에서 변환): Play 앱 서명 키 `NYCzHWs1NMxxD+o/ZsapjEuYIuw=`(SHA-1 35:80:...:22:EC, 내부 테스트·스토어 설치 앱용), 업로드 키 `RLu4MYjZzrI/ut7ULPEkDm9gGKc=`(SHA-1 44:BB:...:18:A7, EAS 키스토어로 서명한 파일을 직접 설치할 때), 디버그 키 `cKfsac54Xj+f2JUL7K2Xvcg9+NY=`(기존과 동일). 변환은 SHA-1의 16진수를 바이트로 바꿔 base64로 인코딩하며, 같은 방법으로 디버그 키를 변환해 기존 등록값과 일치함을 확인했습니다. 카카오 콘솔 등록과 로그인 동작은 미확인입니다.
