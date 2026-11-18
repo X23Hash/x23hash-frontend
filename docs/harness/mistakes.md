@@ -93,3 +93,11 @@
 - 조치와 현재 상태: 변경을 모두 되돌리고 브랜치를 지운 뒤 계획과 사용자가 할 외부 작업 안내만 진행했습니다. 구현은 사용자가 "시작해"라고 한 뒤에 다시 했습니다.
 - 재발 방지 규칙: 계획을 요청받은 작업에서는 "진행", "ㄱㄱ" 같은 말이 계획의 다음 단계를 뜻하는지 구현을 뜻하는지 불분명하면 수정 전에 확인합니다. 구현 시작은 범위를 알린 뒤 명시적인 지시를 받아서 합니다.
 - 검증 방법과 결과: 이후 외부 등록 안내 단계에서는 문서 기록 외의 파일을 수정하지 않았고, 범위를 안내한 뒤 시작 지시를 받아 구현했습니다.
+
+### 2026-11-18: 로컬 node_modules 오염으로 EAS 빌드의 런타임 버전 불일치
+
+- 상황과 영향: 로컬에서 실행한 `eas build`가 `Configure expo-updates` 단계에서 `Runtime version mismatch`로 실패했습니다(빌드 `e3b1abec`). 원격 빌드 1회가 낭비됐습니다.
+- 확인한 원인: 예전 Android 로컬 빌드가 `node_modules`의 라이브러리 폴더에 `gradlew`, `gradle/`, `local.properties`를 만들고 `AndroidManifest.xml`을 고쳐 둔 상태였습니다. fingerprint 기본 제외 경로에 없는 파일이라 로컬 계산값이 EAS의 깨끗한 설치 값과 달랐습니다. CI는 매번 `npm ci`를 하므로 영향이 없었습니다.
+- 조치와 현재 상태: `rm -rf node_modules && npm ci` 후 `npx expo-updates runtimeversion:resolve --platform ios` 결과가 EAS 값과 같은 것을 확인하고 재빌드해 성공했습니다(빌드 `ce934ee0`).
+- 재발 방지 규칙: 로컬에서 fingerprint 런타임 정책의 EAS 빌드를 실행하기 전에, 그 PC에서 Android 로컬 빌드를 한 적이 있으면 `npm ci`로 의존성을 다시 설치하고 로컬 런타임 버전을 먼저 확인합니다.
+- 검증 방법과 결과: 재설치 후 iOS 빌드가 해당 단계를 통과했습니다.
