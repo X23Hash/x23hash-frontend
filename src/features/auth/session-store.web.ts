@@ -6,7 +6,7 @@ export type StoredSession = {
   consented: boolean;
 };
 
-const key = "tomyx.auth.v1";
+const key = "x23hash.auth.v1";
 let memory: string | null = null;
 
 type WebStorage = {

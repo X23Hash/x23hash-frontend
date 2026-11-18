@@ -44,8 +44,8 @@
 ## 직접 준비할 항목
 
 1. **Expo:** 기존 EXPO_TOKEN이 Update·Build·Submit에도 접근 가능한지 확인합니다. EAS의 preview 환경은 테스트 서버 설정, production 환경은 실제 서비스 설정으로 관리합니다. 현재 앱 전용 서버 변수는 없습니다.
-2. **Google Play:** 개발자 계정, `com.tomyx.android` 앱, 첫 AAB 수동 업로드, Play 제출 권한이 있는 서비스 계정이 필요합니다. 서비스 계정 JSON은 EAS credentials에 저장합니다.
-3. **Apple:** 유료 Developer 계정, `com.tomyx.ios` App Store Connect 앱, 배포 인증서·프로비저닝·API key를 준비합니다. 숫자 Apple 앱 ID를 `eas.json`의 `submit.production.ios.ascAppId`에 기록합니다. TestFlight 테스터와 그룹을 설정하고 설치할 수 있는지 확인합니다.
+2. **Google Play:** 개발자 계정, `com.x23hash.android` 앱(2026-11-18 이름 변경 전 `com.tomyx.android`), 첫 AAB 수동 업로드, Play 제출 권한이 있는 서비스 계정이 필요합니다. 서비스 계정 JSON은 EAS credentials에 저장합니다.
+3. **Apple:** 유료 Developer 계정, `com.x23hash.ios` App Store Connect 앱(2026-11-18 이름 변경 전 `com.tomyx.ios`), 배포 인증서·프로비저닝·API key를 준비합니다. 숫자 Apple 앱 ID를 `eas.json`의 `submit.production.ios.ascAppId`에 기록합니다. TestFlight 테스터와 그룹을 설정하고 설치할 수 있는지 확인합니다.
 4. **자격증명 초기화:** `npx eas-cli@latest credentials --platform android`와 `--platform ios`로 서명·제출 자격증명을 준비합니다. 최초 비대화형 빌드 전에는 `npx eas-cli@latest build --profile testing --platform android` 또는 `ios`로 플랫폼별 초기 설정을 완료해야 할 수 있습니다. 이는 원격 유료 빌드를 시작할 수 있는 명령입니다.
 5. **GitHub:** Actions Variable `APP_TEST_ENABLED`를 문자열 `true`로 등록합니다. 두 상태 태그를 Ruleset으로 막지 않고, 조직 정책이 워크플로의 contents:write를 허용하는지 확인합니다. 모든 태그에 동일한 보호 규칙이 있다면 이 두 이름만 예외로 둡니다.
 6. **첫 검증:** 설정을 커밋하고 main에 반영한 뒤 Actions와 EAS에서 두 플랫폼의 최초 테스트 빌드·제출을 확인합니다. 다음 공통 UI 변경에서는 OTA 분기로 들어가는지, 설치한 테스트 앱을 다시 열었을 때 반영되는지 확인합니다. 실패한 플랫폼만 job을 재실행할 수 있습니다.
@@ -68,3 +68,13 @@
 - Android 새 testing AAB 빌드와 [Play 내부 테스트 제출](https://expo.dev/accounts/to-my-x/projects/to-my-x/submissions/58db4cac-b651-414d-a39c-4c73858f213b) 성공.
 - iOS 새 testing 빌드와 [TestFlight 제출](https://expo.dev/accounts/to-my-x/projects/to-my-x/submissions/498c8c2e-518d-47e8-8563-155ccf26dcbc) 성공.
 - 성공 기준 태그 두 개의 SHA·fingerprint·buildId와 pending=null을 확인했습니다. 다음 호환 변경의 OTA 자동 분기와 이번 새 버전 설치·실행은 별도 확인 대상입니다.
+
+### 서비스 이름 변경에 따른 재설정 — 2026-11-18
+
+[서비스 이름 변경](rebrand-x23hash.md)으로 패키지·번들 ID·Apple 계정이 바뀌어 스토어 기준으로는 새 앱입니다. 위 2026-10-19 검증은 옛 앱의 기록입니다.
+
+- 새 식별자에는 서명·제출 자격증명이 없습니다. Android 업로드 키, iOS 배포 인증서·프로비저닝(새 Apple 팀), App Store Connect API 키, Play 서비스 계정의 새 앱 권한을 먼저 준비하고 첫 AAB를 수동 업로드해야 자동 제출이 성공합니다. 준비 전에 main에 반영하면 `app-test` 작업이 실패하므로 그 전까지는 `APP_TEST_ENABLED`를 끄거나 실패를 감수합니다.
+- 식별자 변경으로 fingerprint가 달라져 성공 기준 태그 `app-test-android`·`app-test-ios`가 남아 있어도 첫 실행은 OTA가 아닌 빌드·제출로 진행됩니다. 태그는 삭제하지 않습니다.
+- iOS 앱 ID는 `6836202739`로 `eas.json`에 반영했습니다.
+- 2026-11-18 준비 완료: iOS 배포 인증서·프로비저닝(새 팀 `R4PW5MSL4D`)과 제출용 API 키, Android 키스토어와 Play 서비스 계정 키 연결·새 앱 권한, 첫 AAB 수동 업로드를 마쳤습니다. 로컬에서 실행한 `testing` 빌드와 제출이 두 플랫폼 모두 성공했습니다(iOS `ce934ee0` → TestFlight, Android `1144ffd0` → Play 내부 테스트). 빌드 ID와 과정은 [서비스 이름 변경](rebrand-x23hash.md)의 기록을 따릅니다.
+- CI(`app-test` 작업)에서의 새 앱 빌드·제출과 설치·실행은 미확인입니다.

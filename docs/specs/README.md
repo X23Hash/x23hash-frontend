@@ -60,4 +60,5 @@ PRD·IA·Tech Spec은 문서 안의 관점이며 별도 산출물로 나누지 �
 | [디자인 시스템과 공통 UI](design-system.md) | 공통 UI·시각 기준 | 컴포넌트·상태·토큰·반응형·접근성과 미확보 자산 |
 | [브랜치별 빌드와 배포](build-deploy.md) | 개발 환경·배포 흐름 | GitHub Actions와 EAS 빌드·배포·제출 |
 | [앱 테스트 자동화](app-test-automation.md) | 배포 흐름·기술 설계 | 변경 판정과 테스트 OTA·바이너리 배포 |
+| [서비스 이름 변경](rebrand-x23hash.md) | 설정·배포 흐름 | ToMyX → *23#(x23hash) 식별자·주소·스토어 재등록 계획 |
 | [프론트엔드 아키텍처](frontend-architecture.md) | 공통 구조·기술 설계 | 기능별 구성과 의존성·상태·플랫폼 경계 |

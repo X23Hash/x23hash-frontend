@@ -22,7 +22,7 @@ const { chromium } = require('playwright');
   await button('돌아가서 수정하기').click();assert.equal(await input.inputValue(),'오늘은 네 생각이 났어.\n잘 지내고 있니?');
   await button('뒤로').click();await button('계속 작성하기').click();assert.ok((await input.inputValue()).length);
   await button('뒤로').click();await button('나중에 쓰기').click();await button('이야기 쓰기').click();await button('이어서 쓰기').click();assert.ok((await input.inputValue()).length);
-  await page.screenshot({path:'/tmp/tomyx-editor.png'});
+  await page.screenshot({path:'/tmp/x23hash-editor.png'});
   await input.fill('가'.repeat(1001));assert.equal((await input.inputValue()).length,1000);
   await page.goto('http://localhost:8082/write/preview');await button('Mock 로그인으로 연결 확인').waitFor();
   assert.deepEqual(errors,[]);console.log('Flow passed: cancel + feed scroll, mock consent, edit/preview/confirm, retained body, leave/resume, limit, guarded URL');

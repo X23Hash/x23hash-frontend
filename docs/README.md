@@ -1,6 +1,6 @@
 # 프로젝트 문서
 
-ToMyX의 명세와 작업 지식을 모으는 곳입니다. Claude Code와 Codex는 대화 이력에 의존하지 않고 이 문서에서 필요한 맥락을 찾아 작업을 이어갑니다.
+x23hash(서비스 이름 `*23#`, 구 ToMyX)의 명세와 작업 지식을 모으는 곳입니다. Claude Code와 Codex는 대화 이력에 의존하지 않고 이 문서에서 필요한 맥락을 찾아 작업을 이어갑니다.
 
 ## 읽는 순서
 
@@ -37,6 +37,7 @@ ToMyX의 명세와 작업 지식을 모으는 곳입니다. Claude Code와 Codex
 | [커밋 컨벤션](conventions/commit.md) | 메시지 형식, 타입, 스코프, 목적별 커밋 분리 |
 | [앱 테스트 자동화](specs/app-test-automation.md) | 변경 감지·테스트 OTA·내부 테스트와 직접 준비할 설정 |
 | [빌드와 배포](specs/build-deploy.md) | 브랜치별 CI/CD와 EAS·스토어 초기 설정 |
+| [서비스 이름 변경](specs/rebrand-x23hash.md) | ToMyX → *23#(x23hash) 변경 범위, 확정·미결정 사항, 진행 순서 |
 | [브랜치 운영 규칙](conventions/branch.md) | main·develop의 역할, 임시 브랜치, 배포·긴급 수정 흐름 |
 
 루트의 `README.md`, `AGENTS.md`, `CLAUDE.md`는 진입점으로 유지합니다. 상세 Markdown 문서는 `docs/`에 모읍니다.

@@ -1,4 +1,4 @@
-// To-My-X 인증 API 계약(/api/v1/auth). 공통 클라이언트가 ApiResponse 봉투를 해석합니다.
+// *23# 인증 API 계약(/api/v1/auth). 공통 클라이언트가 ApiResponse 봉투를 해석합니다.
 // node 테스트가 직접 로드하는 모듈이라 Metro 전용 @ 별칭 대신 상대 경로를 씁니다.
 import { api } from "../../../lib/api.ts";
 

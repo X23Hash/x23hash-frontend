@@ -9,7 +9,7 @@ export type StoredSession = {
   consented: boolean;
 };
 
-const key = "tomyx.auth.v1";
+const key = "x23hash.auth.v1";
 // 보안 저장 실패(기기 잠금 상태 등) 시 앱 실행 동안만 유지하는 폴백입니다.
 let memory: string | null = null;
 

@@ -39,7 +39,7 @@ function CtaButton({
   );
 }
 
-// 시안(2-02) 구성: 어두운 배경 위 To My X, 상황 재현 패널(진입·선택·행동 A만),
+// 시안(2-02) 구성: 어두운 배경 위 *23#, 상황 재현 패널(진입·선택·행동 A만),
 // 장면 라벨·서사, 하단 고정 프롬프트와 CTA 순서로 페이드 인합니다.
 // 뒤로 버튼은 시안에 없으며 시스템 뒤로만 직전 장면을 복원합니다(라우트에서 처리).
 export function OnboardingScreen({
@@ -84,7 +84,7 @@ export function OnboardingScreen({
         ]}
       >
         <Text accessibilityRole="header" style={styles.brand}>
-          To My X
+          *23#
         </Text>
         <ScrollView
           showsVerticalScrollIndicator={false}

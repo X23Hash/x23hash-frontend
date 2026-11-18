@@ -85,7 +85,7 @@ export function StorySheets({
   const copy = async () => {
     const origin =
       (globalThis as { location?: { origin: string } }).location?.origin ??
-      "https://to-my-x.expo.app";
+      "https://x23hash.pages.dev";
     const url = shareUrl ?? `${origin}/stories/${storyId}`;
     try {
       await (

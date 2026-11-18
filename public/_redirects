@@ -1,0 +1,2 @@
+/stories/:id /stories/[id] 200
+/legal/:kind /legal/[kind] 200

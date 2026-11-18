@@ -27,11 +27,11 @@ export function DeleteAccountScreen({
   };
   if (phase === "done")
     return (
-      <FlowPage title="To My X" onBack={onFinish}>
+      <FlowPage title="*23#" onBack={onFinish}>
         <Text accessibilityRole="header" style={f.title}>
           탈퇴가{"\n"}완료됐어요.
         </Text>
-        <Text style={f.muted}>그동안 To My X를 이용해 주셔서 고마워요.</Text>
+        <Text style={f.muted}>그동안 *23#을 이용해 주셔서 고마워요.</Text>
         <ActionButton label="처음으로" onPress={onFinish} />
       </FlowPage>
     );

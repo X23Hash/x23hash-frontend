@@ -60,12 +60,12 @@ test("kakao authorize url keeps openid scope and verifiable state", () => {
     setItem: (key, value) => storage.set(key, value),
     removeItem: (key) => storage.delete(key),
   };
-  globalThis.location = { origin: "https://to-my-x.test", href: "" };
+  globalThis.location = { origin: "https://x23hash.test", href: "" };
   const url = new URL(kakao.buildKakaoAuthorizeUrl("my"));
   assert.equal(url.origin + url.pathname, "https://kauth.kakao.com/oauth/authorize");
   assert.equal(url.searchParams.get("scope"), "openid");
   assert.equal(url.searchParams.get("response_type"), "code");
-  assert.equal(url.searchParams.get("redirect_uri"), "https://to-my-x.test/login");
+  assert.equal(url.searchParams.get("redirect_uri"), "https://x23hash.test/login");
   const state = url.searchParams.get("state");
   assert.ok(state.endsWith(".my"));
   // 보관된 state와 일치하면 next 키를 복원하고, 일치하지 않으면 거부합니다.

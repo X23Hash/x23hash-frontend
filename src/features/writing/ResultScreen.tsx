@@ -92,7 +92,7 @@ export function ResultScreen({
   if (phase.name === "submitting" || phase.name === "retrying") {
     const retrying = phase.name === "retrying";
     return (
-      <FlowPage title="To My X">
+      <FlowPage title="*23#">
         <View style={f.group}>
           <ActivityIndicator
             accessibilityLabel={retrying ? "다시 남기는 중" : "남기는 중"}
@@ -112,7 +112,7 @@ export function ResultScreen({
   }
   if (phase.name === "done")
     return (
-      <FlowPage title="To My X">
+      <FlowPage title="*23#">
         <Text accessibilityRole="header" style={f.title}>
           마음이 남겨졌어요.
         </Text>
@@ -127,7 +127,7 @@ export function ResultScreen({
       </FlowPage>
     );
   return (
-    <FlowPage title="To My X" onBack={onEdit}>
+    <FlowPage title="*23#" onBack={onEdit}>
       <Text accessibilityRole="header" style={f.title}>
         마음을 남기지{"\n"}못했어요.
       </Text>

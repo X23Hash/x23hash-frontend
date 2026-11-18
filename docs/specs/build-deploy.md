@@ -4,8 +4,8 @@
 - 명세 상태: 확정
 - 구현 상태: 파일 구성 완료, 외부 연결 대기
 - 검증 상태: 일부 확인
-- 갱신일: 2026-10-14
-- 확정 근거: 사용자가 브랜치별 웹 자동 배포와 스킬을 통한 앱 빌드·배포로 변경했습니다. 웹은 EAS Hosting, 앱 제출은 Google Play 내부 테스트와 TestFlight입니다.
+- 갱신일: 2026-11-18
+- 확정 근거: 사용자가 브랜치별 웹 자동 배포와 스킬을 통한 앱 빌드·배포로 변경했습니다. 웹은 Cloudflare Pages(2026-11-18 [서비스 이름 변경](rebrand-x23hash.md)으로 EAS Hosting에서 변경), 앱 제출은 Google Play 내부 테스트와 TestFlight입니다.
 - 관련 규칙: [브랜치 운영](../conventions/branch.md)
 - 관련 서비스 정책: 없음
 
@@ -15,8 +15,8 @@
 
 | 대상 | 웹 | Android | iOS |
 | --- | --- | --- | --- |
-| develop | 정적 빌드와 EAS Hosting develop alias 배포 | 자동 실행 없음 | 자동 실행 없음 |
-| main | 정적 빌드와 EAS Hosting 프로덕션 배포 | 변경 판정 후 테스트 OTA 또는 Play 내부 테스트 | 변경 판정 후 테스트 OTA 또는 TestFlight |
+| develop | 정적 빌드와 Cloudflare Pages 미리보기(`develop.x23hash.pages.dev`) 배포 | 자동 실행 없음 | 자동 실행 없음 |
+| main | 정적 빌드와 Cloudflare Pages 프로덕션(`x23hash.pages.dev`) 배포 | 변경 판정 후 테스트 OTA 또는 Play 내부 테스트 | 변경 판정 후 테스트 OTA 또는 TestFlight |
 | 두 브랜치 대상 PR | 검사와 정적 빌드 결과 보관 | 실행 없음 | 실행 없음 |
 
 앱 테스트 자동화의 설정·판정·수동 프로덕션 절차는 [별도 명세](app-test-automation.md)를 따릅니다. 자동 스토어 공개·심사 제출은 포함하지 않습니다. development 앱은 개발 서버에 연결하는 클라이언트입니다. 서버 없이 실행할 내부 테스트 앱은 기존 preview 프로필을 별도 사용합니다.
@@ -28,7 +28,7 @@
 `앱 릴리스 요청 → app-release → 대상 소스·문서·검사·자격증명 확인 → EAS 빌드 → 요청한 스토어 제출`
 
 - push는 병합뿐 아니라 직접 푸시도 포함합니다. 검사가 실패하면 후속 작업을 실행하지 않습니다.
-- 웹 빌드 결과 dist를 Actions artifact로 보관한 뒤 develop은 alias, main은 프로덕션 URL에 배포합니다.
+- 웹 빌드 결과 dist를 Actions artifact로 보관한 뒤 `wrangler pages deploy`로 develop은 미리보기 주소, main은 프로덕션 주소에 올립니다.
 - 앱 테스트 배포는 main에서 enable 변수와 마지막 성공 기준에 따라 실행합니다. 수동 앱 릴리스도 가능하며, 기본 소스는 main입니다. 성공한 이번 빌드 ID만 제출하며 `--latest`는 사용하지 않습니다.
 - 같은 브랜치의 실행은 직렬화합니다. 실행 중인 작업은 취소하지 않습니다. GitHub concurrency는 여러 대기 실행 중 이전 대기 실행을 대체할 수 있으므로 모든 중간 커밋의 빌드를 보장하는 큐가 아닙니다.
 - 수동 실행은 develop·main에서 가능합니다. 다른 브랜치에서는 검사와 웹 빌드만 수행합니다.
@@ -51,20 +51,26 @@ Settings → Secrets and variables → Actions에서 설정합니다. 비밀값�
 
 | 종류 | 이름 | 용도 |
 | --- | --- | --- |
-| Secret | EXPO_TOKEN | ToMyX EAS 프로젝트의 빌드·배포·제출 권한이 있는 Expo 토큰 |
+| Secret | EXPO_TOKEN | EAS 프로젝트(`@x23hash/to-my-x`)의 빌드·업데이트·제출 권한이 있는 Expo 토큰 |
+| Secret | CLOUDFLARE_API_TOKEN | Cloudflare Pages 편집 권한만 가진 API 토큰(웹 배포) |
+| Secret | CLOUDFLARE_ACCOUNT_ID | Pages 프로젝트가 있는 Cloudflare 계정 ID |
 
 2026-10-14 EXPO_TOKEN secret 등록을 확인했고, 사용자가 웹 준비 완료를 확인했습니다. App Store Connect 앱은 사용자 확인상 등록 전입니다. 파일 구성이 완료돼도 실제 배포 활성화까지 완료됐다고 보고하지 않습니다.
 
-### EAS Hosting
+### Cloudflare Pages
 
-Expo 프로젝트의 Hosting 화면에서 preview subdomain을 먼저 선택합니다. 최초 이름 선택이 남아 있으면 비대화형 배포가 실패할 수 있습니다. develop alias와 프로덕션 URL은 실제 CLI 출력·Hosting 화면에서 확인합니다.
+- Pages 프로젝트 `x23hash`는 Direct Upload 방식입니다. 빌드는 Actions가 하고 결과물 `dist`만 `npx wrangler@4 pages deploy dist --project-name x23hash --branch <브랜치>`로 올립니다. Direct Upload 프로젝트는 Git 연동으로 바꿀 수 없으므로 대시보드에서 저장소를 연결하지 않습니다.
+- 배포 브랜치가 프로젝트의 프로덕션 브랜치와 같으면 `x23hash.pages.dev`, 다르면 `<브랜치>.x23hash.pages.dev` 미리보기로 올라갑니다. 프로덕션 브랜치는 `main`입니다(프로젝트를 `wrangler pages project create x23hash --production-branch main`으로 만든 사용자 터미널 기록, 2026-11-18).
+- 동적 라우트는 `public/_redirects`의 재작성 규칙으로 정적 파일에 연결합니다(`/stories/:id` → `stories/[id].html`, `/legal/:kind` → `legal/[kind].html`). 동적 라우트를 추가하면 이 파일에도 한 줄을 추가합니다.
+- `build:web`이 `+not-found.html`을 `404.html`로 복사합니다. 최상위 `404.html`이 없으면 Pages가 없는 주소에도 첫 화면을 200으로 내려줍니다.
+- 카카오 Redirect URI와 서버 CORS에는 프로덕션·develop 미리보기 주소를 모두 등록해야 합니다. 값은 [계정 스펙](account-access.md)의 2026-11-18 기록을 따릅니다.
 
 ### 서명과 스토어 연결
 
 1. Android keystore와 iOS 인증서·프로비저닝 프로필을 EAS에 준비합니다. 앱 스킬에서 사용할 플랫폼·프로필을 먼저 설정합니다.
 2. development 프로필의 iOS 실기기 빌드는 Apple Developer 계정과 등록한 기기 UDID가 필요합니다. 새 기기를 추가하면 프로비저닝 프로필을 갱신합니다. development-simulator는 수동 테스트용으로 유지합니다.
-3. Google Play에 `com.tomyx.android` 앱을 만들고 첫 바이너리 업로드를 수동으로 완료합니다. Google Play 서비스 계정과 제출 권한을 설정하고 EAS에 제출 자격증명으로 저장합니다.
-4. App Store Connect에 `com.tomyx.ios` 앱을 만들고 숫자 앱 ID를 eas.json의 submit.production.ios.ascAppId에 기록합니다. API key는 EAS에 제출 자격증명으로 저장합니다.
+3. Google Play에 `com.x23hash.android` 앱을 만들고 첫 바이너리 업로드를 수동으로 완료합니다. Google Play 서비스 계정과 제출 권한을 설정하고 EAS에 제출 자격증명으로 저장합니다.
+4. App Store Connect에 `com.x23hash.ios` 앱을 만들고 숫자 앱 ID를 eas.json의 submit.production.ios.ascAppId에 기록합니다. API key는 EAS에 제출 자격증명으로 저장합니다.
 5. `npx eas-cli@latest credentials --platform android`와 `npx eas-cli@latest credentials --platform ios`로 자격증명을 관리합니다. 비밀키를 코드에 넣지 않습니다.
 
 Submit 성공은 공개 완료가 아닙니다. Google Play 초기 설정·검토, Apple의 처리 완료와 TestFlight 그룹 설정이 추가로 필요할 수 있습니다.
@@ -87,7 +93,7 @@ Submit 성공은 공개 완료가 아닙니다. Google Play 초기 설정·검�
 - 자동화 성공 기준 태그 app-test-android·app-test-ios가 이전 앱의 기록을 재사용하지 않는가? 대상 변경 시 기존 상태를 보존·확인한 뒤 해당 플랫폼 기준을 재설정하거나 앱별로 분리하고, 새 앱 최초 실행이 OTA가 아닌 빌드·제출로 진행되도록 합니다. 태그는 지금 삭제하지 않습니다.
 - production 환경·채널과 최종 앱의 runtime이 맞는가? 기존 테스트 앱의 OTA 성공을 새 앱 배포 검증으로 대신하지 않습니다.
 
-최종 계정·표시 이름·식별자·스토어 앱 ID와 전환 실행 시점은 미정입니다. 위 점검은 에이전트 릴리스 절차이며, CI가 이 결정을 자동으로 검증하는 기능은 아직 없습니다.
+2026-11-18 확정: 표시 이름 `*23#`, 식별자 `com.x23hash.android`·`com.x23hash.ios`, 새 개인 Apple 계정의 앱 ID `6836202739`로 전환합니다. 상세와 남은 외부 설정은 [서비스 이름 변경](rebrand-x23hash.md)을 따릅니다. 위 점검은 에이전트 릴리스 절차이며, CI가 이 결정을 자동으로 검증하는 기능은 아직 없습니다.
 
 ## 제품 공개 출시 준비
 
@@ -103,10 +109,14 @@ Submit 성공은 공개 완료가 아닙니다. Google Play 초기 설정·검�
 | 웹 정적 빌드 성공 | npm run build:web | 통과 |
 | develop 웹 배포 성공 | Actions 38521762369 | 통과 |
 | main 웹 배포·앱 빌드·제출 | 각 대상의 실제 실행 | 미실행 |
+| Cloudflare Pages 동적 주소·404 응답 | `wrangler pages dev dist` 로컬 에뮬레이터 | 통과(2026-11-18) |
+| Cloudflare Pages develop 배포 | Actions 44252478283, `https://develop.x23hash.pages.dev` 응답 조회 | 통과(2026-11-18). `/`·`/stories/123`·`/legal/terms` 200, 없는 주소 404 |
+| Cloudflare Pages main 배포 | main push의 Actions 실행 | 미실행. `x23hash.pages.dev`는 아직 배포가 없어 404 |
 
 ## 변경 기록
 
 - 2026-10-14: 웹은 develop·main 자동 배포, 앱은 요청 시 app-release 스킬로 빌드·제출하도록 확정했습니다. 머지마다 앱 바이너리를 생성하는 미커밋 구성을 변경했습니다.
+- 2026-11-18: 서비스 이름 변경에 맞춰 웹 호스팅을 EAS Hosting에서 Cloudflare Pages로 옮기고 식별자를 `com.x23hash.*`로 바꿨습니다. 도메인 하나 때문에 Expo 구독을 하지 않기 위함입니다. 아래 2026-10-14 기록의 `to-my-x--develop.expo.app`은 옛 주소입니다.
 
 ## CI 검증 기록 — 2026-10-14
 
