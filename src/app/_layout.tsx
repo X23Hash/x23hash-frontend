@@ -2,6 +2,7 @@ import { AuthProvider } from "@/features/auth/auth-session";
 import { mergeGuestHidden } from "@/features/posts/api";
 import { WritingSessionProvider } from "@/features/writing/writing-session";
 import "@/global.css";
+import "@/lib/register-device-store";
 import { tokens } from "@/theme/tokens";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";

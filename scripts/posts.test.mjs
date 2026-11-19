@@ -135,3 +135,23 @@ test("공통 클라이언트는 401에서 재발급 후 1회 재시도하고 429
     },
   );
 });
+
+test("게스트 숨김은 등록된 기기 저장소에 남아 재시작 후에도 읽힌다", async () => {
+  const { registerDeviceStore } = await import("../src/lib/device-store.ts");
+  globalThis.localStorage = undefined;
+  const disk = new Map();
+  registerDeviceStore({
+    getItem: (key) => disk.get(key) ?? null,
+    setItem: (key, value) => disk.set(key, value),
+    removeItem: (key) => disk.delete(key),
+  });
+  hidden.clearHidden();
+  hidden.addHidden("a");
+  assert.equal(disk.get("x23hash.hidden.v1"), '["a"]');
+  // 재시작하면 모듈 메모리가 비므로, 메모리와 다른 저장값이 읽히는지로 확인합니다.
+  disk.set("x23hash.hidden.v1", '["x","y"]');
+  assert.deepEqual(hidden.loadHidden(), ["x", "y"]);
+  hidden.clearHidden();
+  assert.equal(disk.has("x23hash.hidden.v1"), false);
+  registerDeviceStore(null);
+});

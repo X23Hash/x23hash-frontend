@@ -1,8 +1,14 @@
 # 인수인계
 
+## 온보딩·게스트 숨김의 네이티브 영구 저장 — 2026-11-20
+
+- 앱을 다시 켤 때마다 온보딩이 뜨던 문제를 고쳤습니다. 원인은 로그아웃이 아니라 네이티브에서 온보딩 진행이 메모리에만 남던 것입니다. 온보딩 진행과 게스트 숨김을 기기 저장소(expo-secure-store)에 저장합니다. 구조와 검증은 [온보딩 스펙](../specs/onboarding-simulation.md)의 2026-11-20 기록을 따릅니다.
+- 검증: lint·타입·단위 테스트 24개, 모바일 웹, iOS 시뮬레이터(종료 후 재실행 시 장면 복원·완료 후 피드 진입). Android와 게스트 숨김의 네이티브 실기 확인은 미실행입니다.
+- 네이티브 모듈 추가가 없어 main 반영 시 OTA 경로로 배포될 것으로 예상합니다. 새 앱의 OTA 분기는 아직 실검증 전입니다.
+
 ## 서비스 이름 변경(ToMyX → *23#, x23hash) — 2026-11-18
 
-- 코드·설정·CI·문서 변경을 develop에 반영했고 첫 Cloudflare 배포(`https://develop.x23hash.pages.dev`)가 성공했습니다. main에는 아직 반영하지 않았습니다. 범위·결정·검증은 [서비스 이름 변경](../specs/rebrand-x23hash.md)을 따릅니다. 웹은 Cloudflare Pages(`x23hash.pages.dev`)로 옮겼고 식별자는 `com.x23hash.*`, Expo 조직은 `x23hash`, 프로젝트 slug는 `to-my-x` 그대로입니다.
+- 코드·설정·CI·문서 변경을 develop과 main에 반영했습니다(PR #14, merge commit `a7d0e22`). 웹은 `https://x23hash.pages.dev`(main)와 `https://develop.x23hash.pages.dev`(develop)에 배포됐고, main의 `app-test` 작업이 새 식별자로 두 플랫폼의 빌드·제출까지 성공했습니다(Android versionCode 4, iOS 빌드 번호 4). 범위·결정·검증은 [서비스 이름 변경](../specs/rebrand-x23hash.md)을 따릅니다. 웹은 Cloudflare Pages(`x23hash.pages.dev`)로 옮겼고 식별자는 `com.x23hash.*`, Expo 조직은 `x23hash`, 프로젝트 slug는 `to-my-x` 그대로입니다.
 - 로컬 검증만 통과한 상태입니다(lint·타입·단위 테스트 22개, prebuild 식별자·표시 이름, Cloudflare 로컬 에뮬레이터의 동적 주소). 웹의 실서버 데이터·로그인 확인은 실행하지 않았습니다.
 - 새 앱 첫 빌드(develop `facb5db`, `testing` 프로필): iOS `ce934ee0` 성공 후 TestFlight 업로드 성공(Apple 처리·설치 미확인), Android `a7f056e7` 성공 후 사용자가 첫 AAB를 수동 업로드했고, 새 빌드 `1144ffd0`(versionCode 3)의 Play 내부 테스트 자동 제출도 성공했습니다. iOS 서명은 새 Apple 팀 `R4PW5MSL4D`이며, 이 프로젝트의 자격증명 설정에서는 본인 Apple ID로 로그인하지 않고 `EXPO_ASC_*` 환경 변수로 API 키 인증을 씁니다. 설치·실행과 카카오 로그인은 두 플랫폼 모두 미확인입니다.
 - 두 플랫폼의 서명·제출 자격증명과 첫 AAB 수동 업로드가 끝나 main 반영 조건이 해소됐습니다(2026-11-18). 식별자 변경으로 fingerprint가 달라져 main 첫 실행은 두 플랫폼 모두 새 빌드·제출로 진행됩니다. 아래는 준비 전 기록입니다: 준비 전에 반영하면 `app-test` 작업이 실패합니다([앱 테스트 자동화](../specs/app-test-automation.md)의 2026-11-18 기록).

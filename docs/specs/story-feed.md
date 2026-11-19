@@ -252,7 +252,7 @@
 - 카드 표시(사용자 결정 2026-11-07): 제목 자리는 서버 `summary`(본문 앞 20자 발췌), 배경은 서버 필드가 없어 글 ID 코드 포인트 합 기준으로 기존 2종을 고정 배정합니다(같은 글 = 같은 배경). 메타데이터 필드는 서버에 없어 표시하지 않습니다.
 - 공감: PUT `/posts/{id}/reaction`에 목표 최종 상태를 보내고 응답의 `reacted`·`reactionCount`만 반영합니다. 요청 중 같은 글 연타는 잠그고 실패는 기존 값을 유지합니다. 내 글(isMine)은 공감·더보기 버튼을 표시하지 않습니다(서버도 403 거부).
 - 게스트 복귀 의도: 공감·신고·차단을 게스트가 누르면 `x23hash.intent.v1`(2026-11-18 이름 변경 전 `tomyx.intent.v1`, 웹 sessionStorage, 네이티브 메모리)에 1회성 의도를 저장하고 로그인으로 보냅니다. 로그인 후 공감은 원래 글에 목표 상태를 1회 적용하고, 신고·차단은 해당 시트를 다시 열기만 합니다(자동 접수 금지).
-- 숨김: 게스트는 `x23hash.hidden.v1`(2026-11-18 이름 변경 전 `tomyx.hidden.v1`, localStorage)에 저장해 프론트가 거르고, 로그인 직후 POST `/me/hidden-posts`로 합친 뒤 로컬을 비웁니다(실패 시 유지, 다음 로그인에 재시도). 로그인 사용자는 PUT `/me/hidden-posts/{id}` 후 목록에서 제거합니다.
+- 숨김: 게스트는 `x23hash.hidden.v1`(2026-11-18 이름 변경 전 `tomyx.hidden.v1`, 웹 localStorage·2026-11-20부터 네이티브는 기기 저장소 — [온보딩 스펙](onboarding-simulation.md)의 2026-11-20 기록과 같은 저장 경로, 네이티브 실기 확인은 미실행)에 저장해 프론트가 거르고, 로그인 직후 POST `/me/hidden-posts`로 합친 뒤 로컬을 비웁니다(실패 시 유지, 다음 로그인에 재시도). 로그인 사용자는 PUT `/me/hidden-posts/{id}` 후 목록에서 제거합니다.
 - 차단: POST `/posts/{id}/block-author` 성공 후 피드를 다시 조회해 서버 필터를 반영합니다(authorId는 클라이언트에 없음).
 - 신고: 사유 enum(PRIVACY·ABUSE·SPAM·OTHER)으로 접수하고 `alreadyReported`면 기존 접수 문구를 표시합니다. 실패·429는 시트와 사유를 보존하고 메시지(+retryAfter)를 표시합니다.
 - 알림: 커서 목록과 안 읽은 수(GET `/me/notifications*`), 항목별 읽음(PUT `…/read`) 성공만 반영합니다. 벨 점은 unreadCount>0일 때 표시하고 게스트에게 개인 API를 호출하지 않습니다. POST_CREATED는 `/stories/{postId}?mine=1`(내 글 상세)로 이동합니다.
