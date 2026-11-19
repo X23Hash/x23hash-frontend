@@ -1,20 +1,14 @@
-// 로그인 전(게스트) 숨긴 글 저장. 서버 정책: 게스트 숨김은 브라우저에 저장하고
+import { deviceStore } from "../../lib/device-store.ts";
+
+// 로그인 전(게스트) 숨긴 글 저장. 서버 정책: 게스트 숨김은 기기(웹은 브라우저)에 저장하고
 // 프론트가 피드에서 걸러낸 뒤, 로그인 직후 계정 숨김에 합칩니다.
-// localStorage가 없는 네이티브 게스트는 앱 실행 동안만 메모리에 유지합니다.
+// 저장소가 없거나 실패하면 앱 실행 동안만 메모리에 유지합니다.
 const key = "x23hash.hidden.v1";
 let memory: string[] = [];
 
-type WebStorage = {
-  getItem: (key: string) => string | null;
-  setItem: (key: string, value: string) => void;
-  removeItem: (key: string) => void;
-};
-const local = (): WebStorage | null =>
-  (globalThis as { localStorage?: WebStorage }).localStorage ?? null;
-
 export function loadHidden(): string[] {
   try {
-    const raw = local()?.getItem(key);
+    const raw = deviceStore()?.getItem(key);
     if (raw) {
       const data = JSON.parse(raw) as unknown;
       if (Array.isArray(data))
@@ -30,7 +24,7 @@ export function addHidden(postId: string) {
   const next = [...new Set([...loadHidden(), postId])];
   memory = next;
   try {
-    local()?.setItem(key, JSON.stringify(next));
+    deviceStore()?.setItem(key, JSON.stringify(next));
   } catch {
     // 저장 실패해도 메모리 필터는 유지됩니다.
   }
@@ -39,7 +33,7 @@ export function addHidden(postId: string) {
 export function clearHidden() {
   memory = [];
   try {
-    local()?.removeItem(key);
+    deviceStore()?.removeItem(key);
   } catch {
     // 정리 실패는 무시합니다.
   }

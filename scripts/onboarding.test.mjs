@@ -55,3 +55,26 @@ test("progress persists, rejects corrupt data, rebuilds back path", async () => 
   assert.deepEqual(historyFor("actionB"), ["enter", "choice"]);
   assert.deepEqual(historyFor("afterglow"), ["enter", "choice", "actionA"]);
 });
+
+test("progress survives an app restart through the registered device store", async () => {
+  const { registerDeviceStore } = await import("../src/lib/device-store.ts");
+  const { loadProgress, saveProgress } = await import(
+    "../src/features/onboarding/progress.ts"
+  );
+  globalThis.localStorage = undefined;
+  const disk = new Map();
+  registerDeviceStore({
+    getItem: (key) => disk.get(key) ?? null,
+    setItem: (key, value) => disk.set(key, value),
+    removeItem: (key) => disk.delete(key),
+  });
+  saveProgress({ episode: "kakao", scene: "choice", done: true });
+  assert.equal(JSON.parse(disk.get("x23hash.onboarding.v1")).done, true);
+  // 재시작하면 모듈 메모리가 비므로, 메모리와 다른 저장값이 읽히는지로 확인합니다.
+  disk.set(
+    "x23hash.onboarding.v1",
+    JSON.stringify({ episode: "insta", scene: "enter", done: true }),
+  );
+  assert.deepEqual(loadProgress(), { episode: "insta", scene: "enter", done: true });
+  registerDeviceStore(null);
+});
