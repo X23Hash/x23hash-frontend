@@ -35,7 +35,6 @@ export default function LegalRoute() {
   if (!target) return <Redirect href="/settings" />;
   return (
     <FlowPage
-      title={target.title}
       onBack={() =>
         router.canGoBack() ? router.back() : router.replace("/settings")
       }

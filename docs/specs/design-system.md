@@ -135,6 +135,9 @@
 | --- | --- | --- |
 | MaruBuri Regular | `assets/fonts/MaruBuri-Regular.ttf`, [NAVER 공식 배포](https://hangeul.naver.com/hangeul_static/webfont/zips/maruburi.zip) | 제목·본문. [공식 사용 조건](https://help.naver.com/service/30016/contents/18088?osType=PC&lang=ko), SIL OFL 1.1 고지 동봉 |
 | Pretendard Regular | `assets/fonts/Pretendard-Regular.otf`, [공식 v1.3.9](https://github.com/orioncactus/pretendard/tree/v1.3.9) | 메타데이터·버튼. SIL OFL 1.1 원본 고지 동봉 |
+| MaruBuri SemiBold | `assets/fonts/MaruBuri-SemiBold.ttf`, Regular와 같은 NAVER 공식 묶음(2026-11-24 추가) | v0.2 제목(Serif/Heading·Subhead). 고지는 기존 `MaruBuri-LICENSE.txt` |
+| Pretendard Medium · SemiBold | `assets/fonts/Pretendard-Medium.otf`·`Pretendard-SemiBold.otf`, [공식 v1.3.9](https://github.com/orioncactus/pretendard/tree/v1.3.9)(2026-11-24 추가) | v0.2 버튼·배지(Medium), 시트 제목(SemiBold). 고지는 기존 `Pretendard-LICENSE.txt` |
+| 아이콘 19종 · 로고 | `src/components/ui/icon-data.ts`, 사용자가 전달한 원본 SVG(`~/Desktop/ProjectData/x23hash/icon`·`LOGO.svg`, 2026-11-24) | v0.2 헤더·버튼 아이콘. 색은 `currentColor`로 바꿔 호출부가 지정. 토큰·컴포넌트 기준은 [v0.2 반영 계획](v02-update.md) |
 | window-night / cafe-night | `assets/images/feed/`, 자료 `2-04` PDF의 원본 임베디드 JPEG 추출 | mock 검수 전용. 공개 배포 전 권리·최종 원본 확인 필요 |
 | couple-sunset / x-portrait / bedroom-night | `assets/images/onboarding/`, 자료 `2-02` PDF의 원본 임베디드 JPEG 추출 | 온보딩 연출에 그대로 사용(사용자 채택). 공개 배포 전 권리·최종 원본 확인 필요 |
 

@@ -9,7 +9,7 @@ export function ConfirmScreen({
   onSubmit: () => void;
 }) {
   return (
-    <FlowPage title="공개하기 전에" onBack={onEdit}>
+    <FlowPage onBack={onEdit}>
       <Text style={f.title}>이 마음을 익명으로 남길까요?</Text>
       <Text style={f.text}>
         이야기는 익명으로 공개됩니다.{"\n\n"}공개한 뒤에는 개별 글을 수정하거나

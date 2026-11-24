@@ -81,14 +81,14 @@ export function ConsentScreen({
   };
   if (!documents && !documentsError)
     return (
-      <FlowPage title="시작하기 전에" onBack={onCancel}>
+      <FlowPage onBack={onCancel}>
         <ActivityIndicator accessibilityLabel="약관 불러오는 중" color={t.muted} />
         <Text style={f.muted}>약관을 불러오고 있어요.</Text>
       </FlowPage>
     );
   if (documentsError || !terms || !privacy)
     return (
-      <FlowPage title="시작하기 전에" onBack={onCancel}>
+      <FlowPage onBack={onCancel}>
         <Text accessibilityRole="header" style={f.title}>
           약관을{"\n"}불러오지 못했어요.
         </Text>
@@ -100,7 +100,7 @@ export function ConsentScreen({
       </FlowPage>
     );
   return (
-    <FlowPage title="시작하기 전에" onBack={onCancel}>
+    <FlowPage onBack={onCancel}>
       {option("모두 동의하기", all, () => setChecked([!all, !all, !all]))}
       {option(
         `이용약관 동의 (필수) · v${terms.version}`,

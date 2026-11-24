@@ -14,7 +14,10 @@ void SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
   const [loaded, error] = useFonts({
     MaruBuri: require("@/assets/fonts/MaruBuri-Regular.ttf"),
+    "MaruBuri-SemiBold": require("@/assets/fonts/MaruBuri-SemiBold.ttf"),
     Pretendard: require("@/assets/fonts/Pretendard-Regular.otf"),
+    "Pretendard-Medium": require("@/assets/fonts/Pretendard-Medium.otf"),
+    "Pretendard-SemiBold": require("@/assets/fonts/Pretendard-SemiBold.otf"),
   });
   useEffect(() => {
     if (loaded || error) void SplashScreen.hideAsync();

@@ -32,7 +32,7 @@ export function StoryDetailScreen({
 }) {
   if (loading)
     return (
-      <FlowPage title="*23#" onBack={onBack}>
+      <FlowPage onBack={onBack}>
         <View style={f.group}>
           <ActivityIndicator
             accessibilityLabel="이야기 불러오는 중"
@@ -45,7 +45,7 @@ export function StoryDetailScreen({
   // 일시적인 조회 실패는 열람 불가(07.09)와 구분해 재시도를 제공합니다.
   if (error)
     return (
-      <FlowPage title="*23#" onBack={onBack}>
+      <FlowPage onBack={onBack}>
         <Text accessibilityRole="header" style={f.title}>
           이야기를{"\n"}불러오지 못했어요.
         </Text>
@@ -55,7 +55,7 @@ export function StoryDetailScreen({
     );
   if (!story)
     return (
-      <FlowPage title="*23#" onBack={onBack}>
+      <FlowPage onBack={onBack}>
         <Text accessibilityRole="header" style={f.title}>
           이 이야기를{"\n"}볼 수 없어요.
         </Text>
@@ -67,7 +67,7 @@ export function StoryDetailScreen({
       </FlowPage>
     );
   return (
-    <FlowPage title="*23#" onBack={onBack}>
+    <FlowPage onBack={onBack}>
       <Text style={f.muted}>
         {story.isMine ? "내가 남긴 이야기" : "익명의 X가 남긴 이야기"} ·{" "}
         {story.postedAt}

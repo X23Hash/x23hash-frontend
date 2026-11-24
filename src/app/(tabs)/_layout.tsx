@@ -22,7 +22,7 @@ export default function TabsLayout() {
       >
         <View pointerEvents="box-none" style={styles.bar}>
           <View style={styles.navigation}>
-            <IconButton icon="mute" label="소리 꺼짐" />
+            <IconButton icon="speaker-slash" label="소리 꺼짐" />
             <View style={styles.tabs}>
               <TabTrigger
                 name="index"

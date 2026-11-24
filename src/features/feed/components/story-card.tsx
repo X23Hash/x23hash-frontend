@@ -1,4 +1,5 @@
-import { Icon, IconButton } from "@/components/ui/feed-actions";
+import { IconButton } from "@/components/ui/feed-actions";
+import { Icon } from "@/components/ui/icons";
 import { tokens as t } from "@/theme/tokens";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
@@ -102,7 +103,7 @@ export function StoryCard({
         <Text style={styles.signature}>익명의 X가 남긴 이야기</Text>
       </View>
       <View style={styles.scroll}>
-        <Icon name="arrow" size={18} color={t.muted} />
+        <Icon name="arrow-up" size={18} color={t.muted} />
         <Text style={styles.hint}>SCROLL</Text>
       </View>
     </View>

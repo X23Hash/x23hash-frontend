@@ -1,4 +1,5 @@
-import { ActionButton, Icon, IconButton } from "@/components/ui/feed-actions";
+import { ActionButton, IconButton } from "@/components/ui/feed-actions";
+import { Icon, Logo } from "@/components/ui/icons";
 import { tokens as t } from "@/theme/tokens";
 import { useFocusEffect } from "expo-router";
 import { useCallback, useRef, useState } from "react";
@@ -139,7 +140,7 @@ export function FeedScreen({
                 <>
                   <View style={styles.statusIcon}>
                     <Icon
-                      name={feed.error ? "refresh" : "bookmark"}
+                      name={feed.error ? "retry" : "bookmark"}
                       size={28}
                     />
                   </View>
@@ -185,9 +186,9 @@ export function FeedScreen({
         />
         <View
           pointerEvents="box-none"
-          style={[styles.header, { top: insets.top + 22 }]}
+          style={[styles.header, { top: insets.top }]}
         >
-          <Text style={styles.brand}>*23#</Text>
+          <Logo />
           {!hidden && (
             <View style={styles.bell}>
               <IconButton
@@ -216,15 +217,9 @@ const styles = StyleSheet.create({
     position: "absolute",
     left: t.gutter,
     right: t.gutter,
-    height: 48,
+    height: 44,
     alignItems: "center",
     justifyContent: "center",
-  },
-  brand: {
-    color: t.text,
-    fontFamily: t.serif,
-    fontSize: 27,
-    fontWeight: "600",
   },
   bell: { position: "absolute", right: 0 },
   status: { paddingHorizontal: t.gutter, justifyContent: "center", gap: 22 },

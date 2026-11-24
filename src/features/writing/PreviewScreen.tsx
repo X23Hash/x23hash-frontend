@@ -12,7 +12,7 @@ export function PreviewScreen({
   onConfirm: () => void;
 }) {
   return (
-    <FlowPage title="미리보기" onBack={onBack}>
+    <FlowPage onBack={onBack}>
       <Text numberOfLines={1} accessibilityRole="header" style={f.title}>
         {summarize(body)}
       </Text>

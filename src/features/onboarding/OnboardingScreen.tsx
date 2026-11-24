@@ -2,6 +2,7 @@ import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Logo } from "@/components/ui/icons";
 import { tokens as t } from "@/theme/tokens";
 import { episodes, type EpisodeId, type SceneId } from "./episodes";
 import { FadeIn } from "./fade-in";
@@ -80,12 +81,12 @@ export function OnboardingScreen({
       <View
         style={[
           styles.page,
-          { paddingTop: insets.top + 18, paddingBottom: insets.bottom + 16 },
+          { paddingTop: insets.top, paddingBottom: insets.bottom + 16 },
         ]}
       >
-        <Text accessibilityRole="header" style={styles.brand}>
-          *23#
-        </Text>
+        <View style={styles.brand}>
+          <Logo />
+        </View>
         <ScrollView
           showsVerticalScrollIndicator={false}
           style={{ flex: 1 }}
@@ -146,14 +147,7 @@ export function OnboardingScreen({
 const styles = StyleSheet.create({
   outer: { flex: 1, backgroundColor: "#0d0b08", alignItems: "center" },
   page: { flex: 1, width: "100%", maxWidth: t.maxWidth },
-  brand: {
-    color: t.text,
-    fontFamily: t.serif,
-    fontSize: 24,
-    fontWeight: "600",
-    textAlign: "center",
-    marginBottom: 16,
-  },
+  brand: { height: 44, alignItems: "center", justifyContent: "center" },
   body: { flexGrow: 1, paddingHorizontal: t.gutter, paddingBottom: 8 },
   scene: { flex: 1 },
   topSpace: { flex: 0.8, minHeight: 90 },

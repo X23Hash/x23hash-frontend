@@ -27,7 +27,7 @@ export function DeleteAccountScreen({
   };
   if (phase === "done")
     return (
-      <FlowPage title="*23#" onBack={onFinish}>
+      <FlowPage onBack={onFinish}>
         <Text accessibilityRole="header" style={f.title}>
           탈퇴가{"\n"}완료됐어요.
         </Text>
@@ -37,7 +37,7 @@ export function DeleteAccountScreen({
     );
   if (phase === "busy")
     return (
-      <FlowPage title="탈퇴하기">
+      <FlowPage>
         <View style={f.group}>
           <ActivityIndicator accessibilityLabel="탈퇴 처리 중" color={t.muted} />
           <Text accessibilityRole="header" style={f.title}>
@@ -48,7 +48,7 @@ export function DeleteAccountScreen({
       </FlowPage>
     );
   return (
-    <FlowPage title="탈퇴하기" onBack={onBack}>
+    <FlowPage onBack={onBack}>
       <Text accessibilityRole="header" style={f.title}>
         탈퇴하기 전에{"\n"}확인해 주세요.
       </Text>

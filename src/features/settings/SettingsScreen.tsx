@@ -57,7 +57,7 @@ export function SettingsScreen({
   const [confirming, setConfirming] = useState(false);
   return (
     <>
-      <FlowPage title="설정" onBack={onBack}>
+      <FlowPage onBack={onBack}>
         <Section title="계정">
           <Row label="로그인 계정" value={account ?? "불러오는 중"} />
         </Section>

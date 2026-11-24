@@ -31,7 +31,6 @@ export function EditorScreen({
   if (panel !== "editor")
     return (
       <FlowPage
-        title="이야기 쓰기"
         onBack={() => (panel === "resume" ? onExit() : edit())}
       >
         <Text style={f.title}>
@@ -76,7 +75,7 @@ export function EditorScreen({
       </FlowPage>
     );
   return (
-    <FlowPage title="이야기 쓰기" onBack={close}>
+    <FlowPage onBack={close}>
       <Text style={f.title}>
         지금 떠오른 그 사람에게,{"\n"}남기지 못한 말을 적어보세요.
       </Text>

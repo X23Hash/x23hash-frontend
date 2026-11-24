@@ -35,7 +35,7 @@ export function NotificationsScreen({
   onOpen: (id: string) => void;
 }) {
   return (
-    <FlowPage title="알림" onBack={onBack}>
+    <FlowPage onBack={onBack}>
       {guest ? (
         <>
           <Text accessibilityRole="header" style={f.title}>

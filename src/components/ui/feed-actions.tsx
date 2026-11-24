@@ -1,52 +1,7 @@
 import { tokens as t } from "@/theme/tokens";
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import Svg, { Circle, Path } from "react-native-svg";
+import { Icon, type IconName } from "./icons";
 
-const paths = {
-  plus: "M12 4v16M4 12h16",
-  heart:
-    "M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z",
-  share: "M12 15V2m-4 4 4-4 4 4M6 10H4v11h16V10h-2",
-  bell: "M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4",
-  mute: "M11 4 6 8H2v8h4l5 4ZM16 9l6 6m0-6-6 6",
-  bookmark: "M6 3h12v18l-6-4-6 4Z",
-  refresh: "M20 9a8 8 0 1 0 0 6M20 3v6h-6",
-  arrow: "M12 3v18M7 8l5-5 5 5",
-};
-export type IconName = keyof typeof paths | "more";
-export function Icon({
-  name,
-  color = t.text,
-  size = 24,
-  filled = false,
-}: {
-  name: IconName;
-  color?: string;
-  size?: number;
-  filled?: boolean;
-}) {
-  return (
-    <Svg
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke={color}
-      strokeWidth={1.5}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden={true}
-    >
-      {name === "more" ? (
-        [5, 12, 19].map((cx) => (
-          <Circle key={cx} cx={cx} cy={12} r={1} fill={color} />
-        ))
-      ) : (
-        <Path d={paths[name]} fill={filled ? color : "none"} />
-      )}
-    </Svg>
-  );
-}
 export function IconButton({
   icon,
   label,
@@ -77,9 +32,8 @@ export function IconButton({
         style={[styles.icon, bright && styles.bright]}
       >
         <Icon
-          name={icon}
+          name={active && icon === "heart" ? "heart-filled" : icon}
           color={bright ? t.background : t.text}
-          filled={active}
         />
         {badge && <View style={styles.badge} />}
       </Pressable>
