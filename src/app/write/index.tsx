@@ -20,7 +20,7 @@ export default function EditorRoute() {
       }
       exitRequested={exit === "confirm"}
       onKeepEditing={() => setExit("idle")}
-      onPreview={() => router.navigate("/write/preview")}
+      onSubmit={() => router.navigate("/write/confirm")}
     />
   );
 }

@@ -1,6 +1,7 @@
-import { ActionButton } from "@/components/ui/feed-actions";
-import { FlowPage, flowStyles as f } from "@/components/ui/flow-page";
-import { Text } from "react-native";
+import { Button } from "@/components/ui/button";
+import { StatusPage } from "@/components/ui/status-page";
+
+// 02.07 남기기 확인. 이 단계에서는 글을 만들지 않습니다.
 export function ConfirmScreen({
   onEdit,
   onSubmit,
@@ -9,15 +10,15 @@ export function ConfirmScreen({
   onSubmit: () => void;
 }) {
   return (
-    <FlowPage onBack={onEdit}>
-      <Text style={f.title}>이 마음을 익명으로 남길까요?</Text>
-      <Text style={f.text}>
-        이야기는 익명으로 공개됩니다.{"\n\n"}공개한 뒤에는 개별 글을 수정하거나
-        삭제할 수 없습니다.{"\n\n"}실명이나 연락처 등 개인정보가 들어 있지
-        않은지 확인해 주세요.
-      </Text>
-      <ActionButton label="익명으로 남기기" onPress={onSubmit} />
-      <ActionButton label="돌아가서 수정하기" onPress={onEdit} />
-    </FlowPage>
+    <StatusPage
+      icon="pen"
+      title="이 마음을 남길까요?"
+      description={
+        "작성자 이름 없이 스토리 피드에 올라가요.\n남긴 마음은 MY에서 수정하거나 삭제할 수 있어요.\n실명이나 연락처는 남기지 말아주세요."
+      }
+    >
+      <Button label="남기기" onPress={onSubmit} />
+      <Button variant="secondary" label="돌아가서 수정하기" onPress={onEdit} />
+    </StatusPage>
   );
 }

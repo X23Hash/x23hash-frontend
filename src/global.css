@@ -23,3 +23,14 @@ body {
 #root {
   height: 100dvh;
 }
+
+/* 글쓰기 입력창의 안내 문구(02.03)는 본문과 달리 산세리프·흐린 색, 빈 글 오류(02.05)는 밝은 색입니다. */
+.body-input::placeholder {
+  font-family: Pretendard, sans-serif;
+  line-height: 21px;
+  color: #b0a89a;
+  opacity: 1;
+}
+.body-input.error::placeholder {
+  color: #f6f2e8;
+}

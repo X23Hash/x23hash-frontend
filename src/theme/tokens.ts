@@ -26,7 +26,8 @@ export const tabBarBottom = (bottomInset: number) =>
 
 // 텍스트 스타일 11종. 행간은 시안의 비율을 px로 환산한 값입니다.
 export const type = {
-  heading: { fontFamily: tokens.serifBold, fontSize: 24, lineHeight: 35 },
+  // 문서(E)는 SemiBold로 적지만 UI 시안의 제목은 Regular 굵기로 그려져 있어 시안을 따릅니다.
+  heading: { fontFamily: tokens.serif, fontSize: 24, lineHeight: 35 },
   subhead: { fontFamily: tokens.serifBold, fontSize: 15, lineHeight: 22.5 },
   body: { fontFamily: tokens.serif, fontSize: 15, lineHeight: 25.5 },
   choiceSerif: { fontFamily: tokens.serif, fontSize: 15, lineHeight: 21 },
