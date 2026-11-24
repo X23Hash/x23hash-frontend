@@ -22,7 +22,8 @@ x23hash(서비스 이름 `*23#`, 구 ToMyX)의 명세와 작업 지식을 모으
 | [스토리 피드·MY·알림·이야기 관리](specs/story-feed.md) | 04~07의 읽기·목록·공감·공유·숨김·신고·차단 |
 | [로그인·동의·설정·계정 종료](specs/account-access.md) | 08~09의 인증·동의·설정·로그아웃·탈퇴 |
 | [디자인 시스템과 공통 UI](specs/design-system.md) | 컴포넌트 책임·상태, 토큰과 자산의 확인 범위, 시각 차이·접근성 |
-| [전달 자료 원문과 미리보기](references/tomyx-2026-10-20/README.md) | PDF 76개의 출처·해시·텍스트 스냅샷과 디자인 미리보기 9개 |
+| [전달 자료 원문과 미리보기](references/tomyx-2026-10-20/README.md) | v0.1(2026.10.20) PDF 76개의 출처·해시·텍스트 스냅샷과 디자인 미리보기 9개 |
+| [v0.2 전달 자료 원문과 미리보기](references/x23hash-2026-11-19/README.md) | v0.2(2026.11.19) PDF 28개의 출처·해시·텍스트 스냅샷과 UI 미리보기 12개 |
 | [프론트엔드 아키텍처](specs/frontend-architecture.md) | 기능별 구조, 의존성 방향, UI·상태·데이터 분리와 기존 코드 적용 기준 |
 | [Android 로컬 개발](setup/android-local.md) | SDK·Node 경로와 NDK 준비, 로컬 빌드 오류 확인 |
 | [iOS 로컬 개발](setup/ios-local.md) | Xcode·시뮬레이터와 SDK 57 Scene 설정 |
@@ -38,6 +39,7 @@ x23hash(서비스 이름 `*23#`, 구 ToMyX)의 명세와 작업 지식을 모으
 | [앱 테스트 자동화](specs/app-test-automation.md) | 변경 감지·테스트 OTA·내부 테스트와 직접 준비할 설정 |
 | [빌드와 배포](specs/build-deploy.md) | 브랜치별 CI/CD와 EAS·스토어 초기 설정 |
 | [서비스 이름 변경](specs/rebrand-x23hash.md) | ToMyX → *23#(x23hash) 변경 범위, 확정·미결정 사항, 진행 순서 |
+| [v0.2 개편 반영 계획](specs/v02-update.md) | v0.1 → v0.2 변경 요약, 화면별 작업 순서, 서버 의존 항목, 결정 대기 항목 |
 | [브랜치 운영 규칙](conventions/branch.md) | main·develop의 역할, 임시 브랜치, 배포·긴급 수정 흐름 |
 
 루트의 `README.md`, `AGENTS.md`, `CLAUDE.md`는 진입점으로 유지합니다. 상세 Markdown 문서는 `docs/`에 모읍니다.
