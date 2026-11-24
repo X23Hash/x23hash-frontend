@@ -4,7 +4,7 @@ import { resolveReturn } from "@/features/auth/return-target";
 import { Redirect, router, useLocalSearchParams } from "expo-router";
 import { useEffect, useRef } from "react";
 
-// 08.06 필수 동의. 동의 전에 화면을 떠나면 로그인 자체를 취소합니다.
+// 07.06 필수 동의. 동의 전에 화면을 떠나면 로그인 자체를 취소합니다.
 export default function ConsentRoute() {
   const { status, agree, cancelPending } = useSession();
   const { next } = useLocalSearchParams<{ next?: string }>();
@@ -32,7 +32,7 @@ export default function ConsentRoute() {
         cancelPending();
         router.dismissTo("/");
       }}
-      // 문서 보기(09.02/09.03)로 이동해도 체크 상태는 이 화면이 보존합니다.
+      // 문서 보기(08.02/08.03)로 이동해도 체크 상태는 이 화면이 보존합니다.
       onViewDocument={(kind) => router.push(`/legal/${kind}`)}
       onAgree={async (termsVersion, privacyVersion) => {
         await agree(termsVersion, privacyVersion);

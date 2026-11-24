@@ -37,14 +37,18 @@ export default function RootLayout() {
               contentStyle: { backgroundColor: tokens.background },
             }}
           >
-            <Stack.Screen
-              name="login"
-              options={{
-                presentation: "transparentModal",
-                animation: "fade",
-                contentStyle: { backgroundColor: "transparent" },
-              }}
-            />
+            {/* 로그인·약관 동의는 원래 화면 위에 시트로 뜹니다(07.02·07.03·07.06). */}
+            {["login", "consent"].map((name) => (
+              <Stack.Screen
+                key={name}
+                name={name}
+                options={{
+                  presentation: "transparentModal",
+                  animation: "fade",
+                  contentStyle: { backgroundColor: "transparent" },
+                }}
+              />
+            ))}
           </Stack>
         </WritingSessionProvider>
       </AuthProvider>

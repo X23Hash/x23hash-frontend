@@ -1,9 +1,16 @@
-import { ActionButton } from "@/components/ui/feed-actions";
+import { Button } from "@/components/ui/button";
 import { FlowPage, flowStyles as f } from "@/components/ui/flow-page";
-import { tokens as t } from "@/theme/tokens";
-import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native";
+import { StatusPage, statusTop } from "@/components/ui/status-page";
+import { tokens as t, type } from "@/theme/tokens";
+import {
+  ActivityIndicator,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 
-// 05.01 빈 상태 · 05.02 목록 · 05.03 로그인 전입니다.
+// 04.01 빈 상태 · 04.02 목록 · 04.03 로그인 전입니다.
 export type NotificationItem = {
   id: string;
   title: string;
@@ -34,48 +41,70 @@ export function NotificationsScreen({
   onLoadMore: () => void;
   onOpen: (id: string) => void;
 }) {
+  // 비로그인을 0건으로 보여주지 않습니다(04.03).
+  if (guest)
+    return (
+      <StatusPage
+        icon="bell"
+        top={statusTop.notice}
+        title={"로그인하면 알림을\n받을 수 있어요."}
+        inline={<Button small label="로그인하기" onPress={onLogin} />}
+        onBack={onBack}
+      />
+    );
+  if (items.length === 0 && !loading)
+    return error ? (
+      <StatusPage
+        icon="retry"
+        top={statusTop.notice}
+        title={"알림을\n불러오지 못했어요."}
+        description="연결을 확인하고 다시 시도해 주세요."
+        inline={
+          <Button
+            small
+            variant="secondary"
+            label="다시 불러오기"
+            onPress={onRetry}
+          />
+        }
+        onBack={onBack}
+      />
+    ) : (
+      <StatusPage
+        icon="bell"
+        top={statusTop.notice}
+        title={"아직 도착한\n알림이 없어요."}
+        onBack={onBack}
+      />
+    );
   return (
     <FlowPage onBack={onBack}>
-      {guest ? (
-        <>
-          <Text accessibilityRole="header" style={f.title}>
-            로그인하면 알림을{"\n"}받을 수 있어요.
-          </Text>
-          <ActionButton label="로그인하기" onPress={onLogin} />
-        </>
-      ) : loading && items.length === 0 ? (
+      {items.length === 0 ? (
         <View style={f.group}>
-          <ActivityIndicator accessibilityLabel="알림 불러오는 중" color={t.muted} />
+          <ActivityIndicator
+            accessibilityLabel="알림 불러오는 중"
+            color={t.muted}
+          />
           <Text style={f.muted}>알림을 불러오고 있어요.</Text>
         </View>
-      ) : error && items.length === 0 ? (
-        <>
-          <Text accessibilityRole="header" style={f.title}>
-            알림을{"\n"}불러오지 못했어요.
-          </Text>
-          <Text style={f.muted}>연결을 확인하고 다시 시도해 주세요.</Text>
-          <ActionButton label="다시 불러오기" onPress={onRetry} />
-        </>
-      ) : items.length === 0 ? (
-        <Text accessibilityRole="header" style={f.title}>
-          아직 도착한{"\n"}알림이 없어요.
-        </Text>
       ) : (
-        <>
+        <View style={styles.list}>
           {items.map((item) => (
             <Pressable
               key={item.id}
               accessibilityRole="button"
+              accessibilityLabel={
+                item.unread ? `읽지 않음. ${item.title}` : item.title
+              }
               onPress={() => onOpen(item.id)}
-              style={({ pressed }) => [styles.row, pressed && { opacity: 0.7 }]}
+              style={({ pressed }) => [
+                styles.card,
+                item.unread && styles.unread,
+                pressed && { opacity: 0.7 },
+              ]}
             >
-              <View style={styles.titleRow}>
-                {item.unread && <View style={styles.dot} />}
-                <Text style={item.unread ? styles.unread : f.text}>
-                  {item.title}
-                </Text>
-              </View>
-              <Text style={f.muted}>{item.time}</Text>
+              <Text style={styles.title}>{item.title}</Text>
+              <Text style={styles.time}>{item.time}</Text>
             </Pressable>
           ))}
           {error && (
@@ -84,26 +113,36 @@ export function NotificationsScreen({
             </Text>
           )}
           {(hasMore || error) && (
-            <ActionButton
-              label={loading ? "불러오는 중…" : error ? "다시 불러오기" : "더 보기"}
+            <Button
+              small
+              variant="secondary"
+              label={
+                loading ? "불러오는 중…" : error ? "다시 불러오기" : "더 보기"
+              }
               disabled={loading}
               onPress={error ? onRetry : onLoadMore}
             />
           )}
-        </>
+        </View>
       )}
     </FlowPage>
   );
 }
 const styles = StyleSheet.create({
-  row: { padding: 20, gap: 8, borderRadius: 16, backgroundColor: t.surface },
-  titleRow: { flexDirection: "row", alignItems: "center", gap: 8 },
-  dot: { width: 7, height: 7, borderRadius: 4, backgroundColor: "#d8b98a" },
-  unread: {
-    fontFamily: t.sans,
-    fontSize: 15,
-    lineHeight: 25,
-    color: t.text,
-    fontWeight: "600",
+  // 시안: 첫 카드가 헤더 아래 26pt(본문 여백 24 + 2), 카드 사이 12pt.
+  list: { gap: 12, paddingTop: 2 },
+  // 읽지 않은 알림은 밝은 테두리로 구분합니다. 테두리 두께만큼 높이가 달라지지 않게 늘 1pt를 둡니다.
+  card: {
+    paddingHorizontal: 20,
+    paddingTop: 15,
+    paddingBottom: 16,
+    gap: 6,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: t.surface,
+    backgroundColor: t.surface,
   },
+  unread: { borderColor: t.selected },
+  title: { ...type.choice, color: t.text },
+  time: { ...type.caption, color: t.muted },
 });

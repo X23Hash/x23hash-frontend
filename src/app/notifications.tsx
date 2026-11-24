@@ -5,7 +5,7 @@ import {
   type NotificationView,
 } from "@/features/notifications/api";
 import { NotificationsScreen } from "@/features/notifications/NotificationsScreen";
-import { formatDateTime } from "@/lib/format";
+import { formatRecent } from "@/lib/format";
 import { router } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -63,7 +63,7 @@ export default function NotificationsRoute() {
           ),
         )
         .catch(() => {});
-    // 등록 완료 알림은 해당 내 글 상세(06.03)로 이동합니다. 환영 알림은 목록을 유지합니다.
+    // 등록 완료 알림은 해당 내 마음 상세(05.03)로 이동합니다. 환영 알림은 목록을 유지합니다.
     if (item.postId)
       router.push({
         pathname: "/stories/[id]",
@@ -78,7 +78,7 @@ export default function NotificationsRoute() {
       items={items.map((item) => ({
         id: item.id,
         title: item.message,
-        time: formatDateTime(item.createdAt),
+        time: formatRecent(item.createdAt),
         unread: !item.readAt,
       }))}
       hasMore={hasMore}

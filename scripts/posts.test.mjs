@@ -179,3 +179,14 @@ test("MY 카드는 본문의 마지막 줄을 제목으로, 앞 줄들을 발췌
   assert.deepEqual(cardLines("  한 줄뿐인 마음  "), { title: "한 줄뿐인 마음", excerpt: "" });
   assert.deepEqual(cardLines(""), { title: "", excerpt: "" });
 });
+
+test("알림 시각은 방금 전·오늘·어제·날짜로 나뉜다", async () => {
+  const { formatRecent } = await import("../src/lib/format.ts");
+  const now = new Date(2026, 10, 25, 12, 0, 0);
+  const at = (...parts) => new Date(...parts).toISOString();
+  assert.equal(formatRecent(at(2026, 10, 25, 11, 55), now), "방금 전");
+  assert.equal(formatRecent(at(2026, 10, 25, 9, 0), now), "오늘");
+  assert.equal(formatRecent(at(2026, 10, 24, 23, 59), now), "어제");
+  assert.equal(formatRecent(at(2026, 10, 20, 9, 0), now), "2026.11.20");
+  assert.equal(formatRecent(null, now), "");
+});

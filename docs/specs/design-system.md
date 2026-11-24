@@ -38,7 +38,7 @@
 | --- | --- | --- |
 | ScreenShell | 배경·safe area·본문 스크롤·키보드·하단 CTA 배치 | 전 화면 |
 | BrandHeader | `*23#` 제목, 뒤로·닫기·설정·알림의 화면별 조합 | 글쓰기·피드·MY·로그인 등 |
-| ActionButton | 주요·보조·위험 행동, 비활성·처리 중, 연속 탭 잠금 | 계속하기·공개·차단·탈퇴 |
+| Button(v0.2, 옛 ActionButton 대체) | 주요·보조·위험·위험 보조·글자 변형, 비활성·처리 중 | 계속하기·공개·차단·탈퇴 |
 | IconAction | 아이콘과 접근성 이름·선택 상태·누름 영역 | 공감·공유·더보기·소리·벨·+ |
 | ChoiceOption | 미선택·선택, 단일/다중 선택 의미 구분 | 시뮬레이션·신고·동의 |
 | StoryBodyInput | 본문·placeholder·카운터·오류·안내, 긴 글 스크롤 | 03.01·02·07·08 |
@@ -129,7 +129,7 @@
 
 화면·시트 모션: 전체 화면은 `FlowPage`의 reanimated FadeInDown 진입과 네이티브 스택 `slide_from_right` 전환, 시트는 `BottomSheet`·로그인 시트의 배경 FadeIn + SlideInDown(280ms, ease-out cubic, 바운스 없음)을 사용합니다. 스프링 바운스는 과하다는 사용자 피드백으로 제외했습니다. RN `Modal` 안에서는 reanimated 진입 애니메이션이 네이티브에서 실행되지 않아 `BottomSheet`는 Modal 대신 화면 위 오버레이로 그리며, 하드웨어 뒤로 가기 닫기는 아직 연결하지 않았습니다. 모션 시간·easing의 확정 값과 동작 줄이기(reduce motion) 대응은 디자인 토큰과 함께 추후 확정합니다.
 
-공통 구현은 `Icon`, `IconButton`, `ActionButton`과 2026-10-22 추가한 `FlowPage`(헤더·스크롤·푸터 골격), `BottomSheet`(배경 잠금 시트)입니다. 상태 화면·하단 탭·StoryCard는 피드 전용입니다. 기존 Expo 템플릿의 `constants/theme.ts`와 explore 화면은 유지하며 제품 토큰을 참조하지 않습니다. 템플릿 전환 시 정리합니다. 브랜드는 텍스트로 표시하고 아이콘은 SVG 선으로 작성했습니다. 최종 로고·아이콘 원본과의 일치 검수는 남아 있습니다.
+공통 구현은 `Icon`, `Button`(v0.2에서 옛 `ActionButton`을 대체, 2026-11-25 삭제), 2026-10-22 추가한 `FlowPage`(헤더·스크롤·푸터 골격), `BottomSheet`(배경 잠금 시트, v0.2 손잡이), v0.2에서 추가한 `StatusPage`(확인·완료·빈 상태 공통 구성), `CircleAction`, `BellButton`, `CheckCircle`입니다. 상태 화면·하단 탭·StoryCard는 피드 전용입니다. 기존 Expo 템플릿의 `constants/theme.ts`와 explore 화면은 유지하며 제품 토큰을 참조하지 않습니다. 템플릿 전환 시 정리합니다. 브랜드는 텍스트로 표시하고 아이콘은 SVG 선으로 작성했습니다. 최종 로고·아이콘 원본과의 일치 검수는 남아 있습니다.
 
 | 자산 | 경로·출처 | 사용 기준 |
 | --- | --- | --- |

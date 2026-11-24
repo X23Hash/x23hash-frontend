@@ -3,6 +3,7 @@ import { getAccountSettings } from "@/features/settings/api";
 import { SettingsScreen } from "@/features/settings/SettingsScreen";
 import { Redirect, router } from "expo-router";
 import { useEffect, useState } from "react";
+import { Linking } from "react-native";
 
 const providerLabels = {
   KAKAO: "카카오 계정",
@@ -23,7 +24,7 @@ export default function SettingsRoute() {
         if (!active) return;
         setAccount(providerLabels[settings.provider] ?? settings.provider);
         // 서버에 문의 주소가 아직 없으면 빈 값이 옵니다.
-        setSupportEmail(settings.supportEmail || "준비 중");
+        setSupportEmail(settings.supportEmail || undefined);
       })
       .catch(() => {
         // 조회 실패 시 자리 문구를 유지합니다. 메뉴 동작은 영향받지 않습니다.
@@ -45,6 +46,8 @@ export default function SettingsRoute() {
         router.canGoBack() ? router.back() : router.replace("/my")
       }
       onLegal={(kind) => router.push(`/legal/${kind}`)}
+      // 08.01 문의하기: 메일 앱을 엽니다. 열 수 없는 환경에서는 아무 일도 일어나지 않습니다.
+      onContact={(email) => void Linking.openURL(`mailto:${email}`).catch(() => {})}
       onLogout={() => {
         void logout();
         router.dismissTo("/");

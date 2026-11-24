@@ -1,7 +1,8 @@
+import { Button } from "@/components/ui/button";
 import { CircleAction } from "@/components/ui/circle-action";
-import { ActionButton } from "@/components/ui/feed-actions";
 import { FlowPage, flowStyles as f } from "@/components/ui/flow-page";
 import { Icon, Logo } from "@/components/ui/icons";
+import { StatusPage, statusTop } from "@/components/ui/status-page";
 import { tabBarBottom, tokens as t, type } from "@/theme/tokens";
 import type { ReactNode } from "react";
 import {
@@ -14,7 +15,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-// 05.03(05.11) 내 마음 상세 · 공유 링크 공개 상세 · 열람 불가 상태입니다.
+// 05.03(05.11) 내 마음 상세 · 공유 링크 공개 상세 · 06.09 열람 불가 상태입니다.
 export type StoryDetailModel = {
   id: string;
   body: string;
@@ -65,26 +66,35 @@ export function StoryDetailScreen({
   // 일시적인 조회 실패는 열람 불가와 구분해 재시도를 제공합니다.
   if (error)
     return (
-      <FlowPage onBack={onBack}>
-        <Text accessibilityRole="header" style={f.title}>
-          이야기를{"\n"}불러오지 못했어요.
-        </Text>
-        <Text style={f.muted}>연결을 확인하고 다시 시도해 주세요.</Text>
-        <ActionButton label="다시 불러오기" onPress={onRetry} />
-      </FlowPage>
+      <StatusPage
+        icon="retry"
+        top={statusTop.manage}
+        title={"마음을\n불러오지 못했어요."}
+        description="연결을 확인하고 다시 시도해 주세요."
+        inline={
+          <Button
+            small
+            variant="secondary"
+            label="다시 불러오기"
+            onPress={onRetry}
+          />
+        }
+        onBack={onBack}
+      />
     );
+  // 06.09 삭제 · 비공개 · 차단 · 권한 없음
   if (!story)
     return (
-      <FlowPage onBack={onBack}>
-        <Text accessibilityRole="header" style={f.title}>
-          이 이야기를{"\n"}볼 수 없어요.
-        </Text>
-        <Text style={f.muted}>
-          공개가 중단되었거나 접근할 수 없는 글이에요.{"\n"}다른 이야기를
-          만나보세요.
-        </Text>
-        <ActionButton label="다른 이야기 보기" onPress={onExplore} />
-      </FlowPage>
+      <StatusPage
+        icon="alert"
+        top={statusTop.manage}
+        title={"이 마음을\n볼 수 없어요."}
+        description={
+          "공개가 중단되었거나 접근할 수 없어요.\n다른 마음을 만나보세요."
+        }
+      >
+        <Button label="다른 마음 읽어보기" onPress={onExplore} />
+      </StatusPage>
     );
   return (
     <View style={styles.outer}>
