@@ -166,3 +166,16 @@ test("게스트 숨김은 등록된 기기 저장소에 남아 재시작 후에�
   assert.equal(disk.has("x23hash.hidden.v1"), false);
   registerDeviceStore(null);
 });
+
+test("MY 카드는 본문의 마지막 줄을 제목으로, 앞 줄들을 발췌로 쓴다", async () => {
+  const { cardLines } = await import("../src/features/my/card-lines.ts");
+  assert.deepEqual(
+    cardLines("별일 없이 하루를 보내다가\n문득 네 생각이 났어.\n\n그냥 잘 지내고 있으면 좋겠어."),
+    {
+      title: "그냥 잘 지내고 있으면 좋겠어.",
+      excerpt: "별일 없이 하루를 보내다가\n문득 네 생각이 났어.",
+    },
+  );
+  assert.deepEqual(cardLines("  한 줄뿐인 마음  "), { title: "한 줄뿐인 마음", excerpt: "" });
+  assert.deepEqual(cardLines(""), { title: "", excerpt: "" });
+});

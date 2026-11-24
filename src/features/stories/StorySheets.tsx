@@ -1,10 +1,12 @@
 import { BottomSheet } from "@/components/ui/bottom-sheet";
+import { Button } from "@/components/ui/button";
 import { ActionButton } from "@/components/ui/feed-actions";
 import { flowStyles as f } from "@/components/ui/flow-page";
 import { ApiError } from "@/lib/api";
 import type { ReportReason } from "@/features/posts/types";
+import { tokens as t, type } from "@/theme/tokens";
 import { useState } from "react";
-import { Pressable, Text } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 // 07.01~07.08 공유·숨기기·신고·차단 시트. 실제 저장 동작은 라우트가 actions로 주입합니다.
 export type SheetMode =
@@ -107,26 +109,31 @@ export function StorySheets({
   );
   return (
     <BottomSheet visible onClose={busy ? () => {} : onClose}>
+      {/* 05.08·06.01 공유 / 마음 링크 */}
       {mode === "share" && (
         <>
-          <Text accessibilityRole="header" style={f.title}>
+          <Text accessibilityRole="header" style={styles.title}>
             이 마음을 나누고 싶다면
           </Text>
-          <Text style={f.muted}>
-            글쓴이의 정보 없이, 공개된 이야기만 나눠요.
+          <Text style={styles.description}>
+            작성자 정보 없이,{"\n"}공개된 마음만 나눠요.
           </Text>
           {failure}
-          <ActionButton label="이야기 링크 복사" onPress={() => void copy()} />
-          <ActionButton label="닫기" onPress={onClose} />
+          <View style={styles.buttons}>
+            <Button label="링크 복사" onPress={() => void copy()} />
+            <Button variant="secondary" label="닫기" onPress={onClose} />
+          </View>
         </>
       )}
+      {/* 05.09·06.02 공유 / 복사 완료 */}
       {mode === "copied" && (
         <>
-          <Text accessibilityRole="header" style={f.title}>
-            이야기 링크를 복사했어요.
+          <Text accessibilityRole="header" style={styles.title}>
+            링크를 복사했어요.
           </Text>
-          <Text style={f.muted}>대화창에 붙여 넣어 마음을 나눠보세요.</Text>
-          <ActionButton label="확인" onPress={onClose} />
+          <View style={styles.buttons}>
+            <Button label="확인" onPress={onClose} />
+          </View>
         </>
       )}
       {mode === "manage" && (
@@ -252,3 +259,10 @@ export function StorySheets({
     </BottomSheet>
   );
 }
+
+// 시안(05.08): 제목 아래 20pt에 설명, 그 아래 22pt에 버튼, 버튼 사이 16pt. 시트의 기본 간격 18에서 보정합니다.
+const styles = StyleSheet.create({
+  title: { ...type.dialogTitle, color: t.text },
+  description: { ...type.choice, color: t.muted, marginTop: 2 },
+  buttons: { gap: 16, marginTop: 4 },
+});

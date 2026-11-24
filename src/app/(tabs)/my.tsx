@@ -1,8 +1,11 @@
 import { useSession } from "@/features/auth/auth-session";
+import { cardLines } from "@/features/my/card-lines";
 import { MyScreen } from "@/features/my/MyScreen";
+import { useBellDot } from "@/features/notifications/use-bell-dot";
 import { listMyPosts } from "@/features/posts/api";
+import { subscribeFeedInvalidation } from "@/features/posts/feed-refresh";
 import type { PostView } from "@/features/posts/types";
-import { formatDate } from "@/lib/format";
+import { formatStamp } from "@/lib/format";
 import { router } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -44,6 +47,15 @@ export default function MyRoute() {
   useEffect(() => {
     if (ready) load(null);
   }, [ready, load]);
+  // 등록·수정·삭제 뒤에는 목록을 처음부터 다시 불러와 바로 반영합니다(05.10 삭제한 글 즉시 제외).
+  useEffect(
+    () =>
+      subscribeFeedInvalidation(() => {
+        if (ready) load(null);
+      }),
+    [ready, load],
+  );
+  const bellDot = useBellDot(ready);
   return (
     <MyScreen
       guest={!ready && status !== "restoring"}
@@ -51,11 +63,14 @@ export default function MyRoute() {
       error={error}
       stories={items.map((post) => ({
         id: post.id,
-        summary: post.summary,
-        postedAt: formatDate(post.publishedAt),
-        suspended: post.visibility === "SUSPENDED",
+        ...cardLines(post.body),
+        meta: `${formatStamp(post.publishedAt)} · ${
+          post.visibility === "SUSPENDED" ? "공개 중단" : "익명 공개"
+        }`,
       }))}
       hasMore={hasMore}
+      bellDot={bellDot}
+      onBell={() => router.push("/notifications")}
       onLogin={() =>
         router.push({ pathname: "/login", params: { next: "my" } })
       }

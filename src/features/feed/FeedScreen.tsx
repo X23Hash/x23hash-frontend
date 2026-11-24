@@ -1,3 +1,4 @@
+import { BellButton } from "@/components/ui/bell-button";
 import { Button } from "@/components/ui/button";
 import { Icon, Logo } from "@/components/ui/icons";
 import { tokens as t, type } from "@/theme/tokens";
@@ -6,7 +7,6 @@ import { useCallback, useRef, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
-  Pressable,
   StyleSheet,
   Text,
   View,
@@ -190,16 +190,9 @@ export function FeedScreen({
         >
           <Logo />
           {!hidden && (
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel={bellDot ? "알림 · 안 읽은 알림 있음" : "알림"}
-              disabled={!onBell}
-              onPress={onBell}
-              style={styles.bell}
-            >
-              <Icon name="bell" />
-              {bellDot && <View style={styles.dot} />}
-            </Pressable>
+            <View style={styles.bell}>
+              <BellButton dot={bellDot} onPress={onBell} />
+            </View>
           )}
         </View>
         <FullStorySheet
@@ -230,25 +223,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  bell: {
-    position: "absolute",
-    right: 0,
-    width: 48,
-    height: 44,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  dot: {
-    position: "absolute",
-    top: 8,
-    right: 9,
-    width: 9,
-    height: 9,
-    borderRadius: 4.5,
-    borderWidth: 1.5,
-    borderColor: t.background,
-    backgroundColor: t.text,
-  },
+  bell: { position: "absolute", right: 0 },
   loading: { alignItems: "center", justifyContent: "center", gap: 16 },
   status: { paddingHorizontal: t.gutter },
   statusIcon: {

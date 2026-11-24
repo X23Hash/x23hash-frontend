@@ -6,6 +6,7 @@ import {
   Platform,
   Pressable,
   StyleSheet,
+  View,
   type StyleProp,
   type ViewStyle,
 } from "react-native";
@@ -78,6 +79,8 @@ export function BottomSheet({
           }).start();
         }}
       >
+        {/* 기본 시트에는 시안의 손잡이를 둡니다. 자체 배치 시트는 직접 그립니다. */}
+        {!style && <View style={styles.handle} />}
         {children}
       </Animated.View>
     </Animated.View>
@@ -95,5 +98,15 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 28,
     borderTopRightRadius: 28,
     backgroundColor: t.surface,
+  },
+  // 시안: 시트 위에서 29pt, 제목까지 16pt(여백 24·간격 18에서 보정).
+  handle: {
+    alignSelf: "center",
+    width: 40,
+    height: 4,
+    borderRadius: 2,
+    marginTop: 5,
+    marginBottom: -2,
+    backgroundColor: t.muted,
   },
 });

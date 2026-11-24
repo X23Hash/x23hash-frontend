@@ -9,14 +9,18 @@ import { Icon, type IconName } from "./icons";
 export function StatusPage({
   icon,
   iconColor = t.text,
+  low = false,
   title,
   description,
   onBack,
   onClose,
   children,
 }: PropsWithChildren<{
-  icon: IconName;
+  // 05.04처럼 아이콘이 없으면 제목이 아이콘 자리에서 시작합니다.
+  icon?: IconName;
   iconColor?: string;
+  // 시안의 05(MY) 화면들은 02(글쓰기)보다 블록이 20pt 아래에서 시작합니다.
+  low?: boolean;
   title: string;
   description?: string;
   onBack?: () => void;
@@ -28,11 +32,16 @@ export function StatusPage({
       onClose={onClose}
       footer={<View style={styles.actions}>{children}</View>}
     >
-      <View style={styles.block}>
-        <View style={styles.icon}>
-          <Icon name={icon} size={26} color={iconColor} />
-        </View>
-        <Text accessibilityRole="header" style={styles.title}>
+      <View style={[styles.block, low && styles.low]}>
+        {icon && (
+          <View style={styles.icon}>
+            <Icon name={icon} size={26} color={iconColor} />
+          </View>
+        )}
+        <Text
+          accessibilityRole="header"
+          style={[styles.title, !icon && styles.bare]}
+        >
           {title}
         </Text>
         {description && <Text style={styles.description}>{description}</Text>}
@@ -44,6 +53,7 @@ export function StatusPage({
 const styles = StyleSheet.create({
   // 시안: 아이콘 원의 위쪽이 헤더 아래 149pt. 본문 여백 24를 뺀 값입니다.
   block: { paddingTop: 125 },
+  low: { paddingTop: 145 },
   icon: {
     width: 56,
     height: 56,
@@ -53,6 +63,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   title: { ...type.heading, color: t.text, marginTop: 16 },
+  bare: { marginTop: 2 },
   description: { ...type.guide, color: t.muted, marginTop: 16 },
   actions: { paddingHorizontal: t.gutter, paddingBottom: t.gutter, gap: 12 },
 });
