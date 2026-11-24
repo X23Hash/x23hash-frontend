@@ -10,6 +10,12 @@ export type PostView = {
   shareUrl: string;
   reactionCount: number;
   reacted: boolean;
+  // v0.2 필드. 서버 반영 전에는 내려오지 않습니다(2026-11-24 API 문서 기준).
+  updatedAt?: string | null;
+  background?:
+    | { type: "preset"; presetId: string }
+    | { type: "photo"; imageUrl: string }
+    | null;
 };
 
 export type CursorPage<T> = {

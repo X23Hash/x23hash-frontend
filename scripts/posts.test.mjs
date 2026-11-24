@@ -27,8 +27,18 @@ const failure = (status, code, message, result) => ({
 
 test("게시글 ID 기준 배경 배정은 같은 글에 항상 같은 배경을 준다", () => {
   const first = feedApi.backgroundFor("abc123");
-  assert.equal(feedApi.backgroundFor("abc123"), first);
-  assert.ok(["window", "cafe"].includes(first));
+  assert.deepEqual(feedApi.backgroundFor("abc123"), first);
+  assert.equal(first.type, "preset");
+  assert.ok(first.presetId >= 1 && first.presetId <= 6);
+  // 서버가 저장한 배경이 있으면 그 값을 씁니다.
+  assert.deepEqual(
+    feedApi.backgroundFor("abc123", { type: "preset", presetId: "04" }),
+    { type: "preset", presetId: 4 },
+  );
+  assert.deepEqual(
+    feedApi.backgroundFor("abc123", { type: "photo", imageUrl: "https://x/y.jpg" }),
+    { type: "photo", imageUrl: "https://x/y.jpg" },
+  );
   const story = feedApi.toStory({
     id: "p1",
     body: "본문",
@@ -40,7 +50,8 @@ test("게시글 ID 기준 배경 배정은 같은 글에 항상 같은 배경을
     reactionCount: 3,
     reacted: true,
   });
-  assert.equal(story.title, "요약");
+  assert.match(story.postedAt, /^2026\.11\.0[67]\. \d{2}:\d{2}$/);
+  assert.equal(story.background.type, "preset");
   assert.equal(story.reactionCount, 3);
   assert.equal(story.reacted, true);
 });

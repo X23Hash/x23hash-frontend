@@ -6,7 +6,11 @@ import {
   Platform,
   Pressable,
   StyleSheet,
+  type StyleProp,
+  type ViewStyle,
 } from "react-native";
+
+import { holdOverlay } from "./overlay-state";
 
 const native = Platform.OS !== "web";
 
@@ -16,11 +20,18 @@ const native = Platform.OS !== "web";
 export function BottomSheet({
   visible,
   onClose,
+  style,
   children,
-}: PropsWithChildren<{ visible: boolean; onClose: () => void }>) {
+}: PropsWithChildren<{
+  visible: boolean;
+  onClose: () => void;
+  // 기본 여백·간격 대신 자체 배치를 쓰는 시트(예: 전체보기)가 덮어씁니다.
+  style?: StyleProp<ViewStyle>;
+}>) {
   const [backdrop] = useState(() => new Animated.Value(0));
   const [translateY] = useState(() => new Animated.Value(10000));
   const entered = useRef(false);
+  useEffect(() => (visible ? holdOverlay() : undefined), [visible]);
   useEffect(() => {
     if (visible) {
       Animated.timing(backdrop, {
@@ -54,7 +65,7 @@ export function BottomSheet({
       </Animated.View>
       <Animated.View
         accessibilityViewIsModal
-        style={[styles.sheet, { transform: [{ translateY }] }]}
+        style={[styles.sheet, style, { transform: [{ translateY }] }]}
         onLayout={(event) => {
           if (entered.current) return;
           entered.current = true;

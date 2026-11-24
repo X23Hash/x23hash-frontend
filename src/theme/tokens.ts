@@ -20,6 +20,10 @@ export const tokens = {
   maxWidth: 480,
 } as const;
 
+// 하단 내비(48pt)의 아래 여백. 시안은 홈 인디케이터 영역에 6pt 겹쳐 놓습니다.
+export const tabBarBottom = (bottomInset: number) =>
+  Math.max(bottomInset - 6, 16);
+
 // 텍스트 스타일 11종. 행간은 시안의 비율을 px로 환산한 값입니다.
 export const type = {
   heading: { fontFamily: tokens.serifBold, fontSize: 24, lineHeight: 35 },

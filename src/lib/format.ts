@@ -7,6 +7,15 @@ export function formatDate(iso: string | null | undefined): string {
   return `${date.getFullYear()}.${date.getMonth() + 1}.${date.getDate()}`;
 }
 
+// v0.2 글 메타 표기 "YYYY.MM.DD. HH:mm".
+export function formatStamp(iso: string | null | undefined): string {
+  if (!iso) return "";
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return "";
+  const two = (value: number) => String(value).padStart(2, "0");
+  return `${date.getFullYear()}.${two(date.getMonth() + 1)}.${two(date.getDate())}. ${two(date.getHours())}:${two(date.getMinutes())}`;
+}
+
 export function formatDateTime(iso: string | null | undefined): string {
   if (!iso) return "";
   const date = new Date(iso);

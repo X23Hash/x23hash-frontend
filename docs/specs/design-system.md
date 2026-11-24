@@ -138,7 +138,9 @@
 | MaruBuri SemiBold | `assets/fonts/MaruBuri-SemiBold.ttf`, Regular와 같은 NAVER 공식 묶음(2026-11-24 추가) | v0.2 제목(Serif/Heading·Subhead). 고지는 기존 `MaruBuri-LICENSE.txt` |
 | Pretendard Medium · SemiBold | `assets/fonts/Pretendard-Medium.otf`·`Pretendard-SemiBold.otf`, [공식 v1.3.9](https://github.com/orioncactus/pretendard/tree/v1.3.9)(2026-11-24 추가) | v0.2 버튼·배지(Medium), 시트 제목(SemiBold). 고지는 기존 `Pretendard-LICENSE.txt` |
 | 아이콘 19종 · 로고 | `src/components/ui/icon-data.ts`, 사용자가 전달한 원본 SVG(`~/Desktop/ProjectData/x23hash/icon`·`LOGO.svg`, 2026-11-24) | v0.2 헤더·버튼 아이콘. 색은 `currentColor`로 바꿔 호출부가 지정. 토큰·컴포넌트 기준은 [v0.2 반영 계획](v02-update.md) |
-| window-night / cafe-night | `assets/images/feed/`, 자료 `2-04` PDF의 원본 임베디드 JPEG 추출 | mock 검수 전용. 공개 배포 전 권리·최종 원본 확인 필요 |
+| cafe-night | `assets/images/feed/cafe-night.jpg`, 자료 `2-04` PDF의 원본 임베디드 JPEG 추출 | 첫 방문 연출에서만 사용. 피드 배경은 v0.2에서 프리셋으로 바뀌어 window-night는 삭제(2026-11-24). 공개 배포 전 권리·최종 원본 확인 필요 |
+| 피드 배경 프리셋 6종 | `src/features/feed/components/story-background.tsx`, 사용자가 전달한 원본 SVG(`~/Desktop/ProjectData/x23hash/background`, 2026-11-24)의 색·위치 값 | v0.2 00-B. 사진 없는 글의 배경 |
+| 배경 질감 층 | `assets/images/feed/grain.png`(@2x), 전달받은 배경 SVG의 필터를 크롬으로 렌더해 질감만 추출(375×812 기준, 2026-11-24) | 원본의 SVG 필터(`feTurbulence`)를 네이티브에서 그릴 수 없어 이미지로 얹음. 6종의 필터가 같아 한 장을 공유 |
 | couple-sunset / x-portrait / bedroom-night | `assets/images/onboarding/`, 자료 `2-02` PDF의 원본 임베디드 JPEG 추출 | 온보딩 연출에 그대로 사용(사용자 채택). 공개 배포 전 권리·최종 원본 확인 필요 |
 
 폰트는 expo-font로 로드하고 실패 시 시스템 fallback으로 화면 진입을 허용합니다. 배경 명암은 expo-linear-gradient, 아이콘은 react-native-svg를 SDK 57 호환 버전으로 추가했습니다. 네이티브 개발용 앱은 추가된 모듈 반영을 위해 재빌드가 필요할 수 있습니다. 확인한 공식 문서는 [Font](https://docs.expo.dev/versions/v57.0.0/sdk/font/), [LinearGradient](https://docs.expo.dev/versions/v57.0.0/sdk/linear-gradient/), [SVG](https://docs.expo.dev/versions/v57.0.0/sdk/svg/)입니다.

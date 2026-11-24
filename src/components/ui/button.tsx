@@ -27,12 +27,15 @@ const ink: Record<ButtonVariant, string> = {
 export function Button({
   label,
   variant = "primary",
+  small = false,
   disabled = false,
   busy = false,
   onPress,
 }: {
   label: string;
   variant?: ButtonVariant;
+  // 본문 안에 놓는 작은 버튼(예: 다시 불러오기, 로그인하기). 글자 폭에 맞춥니다.
+  small?: boolean;
   disabled?: boolean;
   busy?: boolean;
   onPress?: () => void;
@@ -48,11 +51,18 @@ export function Button({
       onPress={onPress}
       style={({ pressed }) => [
         styles.button,
+        small && styles.small,
         { backgroundColor: dimmed ? t.surface : fill[variant] },
         pressed && { opacity: 0.7 },
       ]}
     >
-      <Text style={[styles.label, { color: dimmed ? t.selected : ink[variant] }]}>
+      <Text
+        style={[
+          styles.label,
+          small && styles.smallLabel,
+          { color: dimmed ? t.selected : ink[variant] },
+        ]}
+      >
         {label}
       </Text>
     </Pressable>
@@ -68,5 +78,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  small: { alignSelf: "flex-start", height: 36, paddingHorizontal: 20 },
   label: { ...type.button },
+  smallLabel: { fontSize: 13 },
 });

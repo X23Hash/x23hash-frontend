@@ -9,6 +9,7 @@ import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 void SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
@@ -25,26 +26,28 @@ export default function RootLayout() {
   if (!loaded && !error) return null;
   return (
     // 로그인·복원 완료 직후 게스트 숨김을 계정으로 병합합니다(서버 정책: 로그인 직후 1회).
-    <AuthProvider onAuthenticated={() => void mergeGuestHidden()}>
-      <WritingSessionProvider>
-        <StatusBar style="light" />
-        <Stack
-          screenOptions={{
-            headerShown: false,
-            animation: "slide_from_right",
-            contentStyle: { backgroundColor: tokens.background },
-          }}
-        >
-          <Stack.Screen
-            name="login"
-            options={{
-              presentation: "transparentModal",
-              animation: "fade",
-              contentStyle: { backgroundColor: "transparent" },
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <AuthProvider onAuthenticated={() => void mergeGuestHidden()}>
+        <WritingSessionProvider>
+          <StatusBar style="light" />
+          <Stack
+            screenOptions={{
+              headerShown: false,
+              animation: "slide_from_right",
+              contentStyle: { backgroundColor: tokens.background },
             }}
-          />
-        </Stack>
-      </WritingSessionProvider>
-    </AuthProvider>
+          >
+            <Stack.Screen
+              name="login"
+              options={{
+                presentation: "transparentModal",
+                animation: "fade",
+                contentStyle: { backgroundColor: "transparent" },
+              }}
+            />
+          </Stack>
+        </WritingSessionProvider>
+      </AuthProvider>
+    </GestureHandlerRootView>
   );
 }
