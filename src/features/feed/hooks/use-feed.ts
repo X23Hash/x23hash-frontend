@@ -11,10 +11,13 @@ export function useFeed(loader: FeedLoader) {
   const [items, setItems] = useState<Story[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  // 당겨서 새로 고침 중. 보던 목록은 그대로 두고 표시만 돌립니다.
+  const [refreshing, setRefreshing] = useState(false);
   const [next, setNext] = useState<string | null>(null);
   const active = useRef<AbortController | null>(null);
   const load = useCallback(
-    (cursor: string | null) => {
+    // quiet: 새로 고침 실패는 보던 목록을 유지하고 오류 화면으로 바꾸지 않습니다.
+    (cursor: string | null, quiet = false) => {
       if (active.current) return;
       const controller = new AbortController();
       active.current = controller;
@@ -34,12 +37,13 @@ export function useFeed(loader: FeedLoader) {
           setNext(page.next);
         })
         .catch(() => {
-          if (!controller.signal.aborted) setError(true);
+          if (!controller.signal.aborted && !quiet) setError(true);
         })
         .finally(() => {
           if (!controller.signal.aborted) {
             active.current = null;
             setLoading(false);
+            setRefreshing(false);
           }
         });
     },
@@ -75,6 +79,15 @@ export function useFeed(loader: FeedLoader) {
     retry: () => loadNext(items.length === 0 ? null : next),
     loadMore: () => {
       if (!error && !loading && next !== null) loadNext(next);
+    },
+    refreshing,
+    // 당겨서 새로 고침·맨 위에서 로고 탭. 목록을 비우지 않고 첫 쪽을 다시 받아 바꿉니다.
+    refresh: () => {
+      active.current?.abort();
+      active.current = null;
+      setError(false);
+      setRefreshing(true);
+      void load(null, true);
     },
     // 등록·숨김·차단 성공 뒤 목록 무효화와 공감 결과 반영에 사용합니다.
     reload: () => {

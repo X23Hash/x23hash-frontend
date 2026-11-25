@@ -1,4 +1,5 @@
 import { Icon } from "@/components/ui/icons";
+import { fullBleed, useSideInsets } from "@/components/ui/side-insets";
 import { tabBarBottom, tokens as t, type } from "@/theme/tokens";
 import { LinearGradient } from "expo-linear-gradient";
 import { useState } from "react";
@@ -40,6 +41,7 @@ export function StoryCard({
   onReadAll?: () => void;
 }) {
   const insets = useSafeAreaInsets();
+  const side = useSideInsets(fullBleed);
   // 글자 수가 아니라 실제 렌더 높이로 넘침을 판정합니다.
   const [room, setRoom] = useState(0);
   const [full, setFull] = useState(0);
@@ -51,7 +53,12 @@ export function StoryCard({
       <View
         style={[
           styles.frame,
-          { top: insets.top + 63, bottom: bar + 124 },
+          {
+            top: insets.top + 63,
+            bottom: bar + 124,
+            left: t.gutter + side.left,
+            right: 18 + side.right,
+          },
         ]}
       >
         <View style={styles.block}>
@@ -61,6 +68,8 @@ export function StoryCard({
                 보이는 높이(onLayout)와 전체 높이(onContentSizeChange)를 따로 잽니다. */}
             <ScrollView
               scrollEnabled={false}
+              // iOS 상태 표시줄 탭(맨 위로)이 피드 목록에 가도록, 스크롤하지 않는 이 영역은 대상에서 뺍니다.
+              scrollsToTop={false}
               showsVerticalScrollIndicator={false}
               style={styles.window}
               onLayout={(event) => setRoom(event.nativeEvent.layout.height)}
@@ -98,7 +107,12 @@ export function StoryCard({
           onMore={onMore}
         />
       </View>
-      <View style={[styles.hint, { bottom: bar + 70 }]}>
+      <View
+        style={[
+          styles.hint,
+          { bottom: bar + 70, left: side.left, right: side.right },
+        ]}
+      >
         <Icon name="arrow-up" size={16} color={t.selected} />
         <Text style={styles.hintText}>SCROLL</Text>
       </View>

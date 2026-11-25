@@ -1,5 +1,6 @@
 import { BottomSheet } from "@/components/ui/bottom-sheet";
 import { Icon } from "@/components/ui/icons";
+import { useSideInsets } from "@/components/ui/side-insets";
 import { tokens as t, type } from "@/theme/tokens";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
@@ -30,6 +31,7 @@ export function FullStorySheet({
   onMore?: () => void;
 }) {
   const insets = useSafeAreaInsets();
+  const side = useSideInsets();
   const drag = useSharedValue(0);
   const scrollY = useSharedValue(0);
   // 본문을 올렸다가 맨 위로 돌아와 계속 끄는 경우, 그 시점부터의 이동만 시트에 반영합니다.
@@ -82,7 +84,13 @@ export function FullStorySheet({
               >
                 <View style={styles.handle} />
               </Pressable>
-              <View style={styles.top}>
+              {/* 접는 기기에서는 시트 오른쪽 위가 옆 상태 표시와 겹칠 수 있어 닫기만 안쪽에 둡니다. */}
+              <View
+                style={[
+                  styles.top,
+                  { paddingRight: t.gutter + side.safeRight },
+                ]}
+              >
                 <Text style={styles.date}>{story.postedAt}</Text>
                 <Pressable
                   accessibilityRole="button"
