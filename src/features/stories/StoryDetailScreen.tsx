@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { CircleAction } from "@/components/ui/circle-action";
 import { FlowPage, flowStyles as f } from "@/components/ui/flow-page";
 import { Icon, Logo } from "@/components/ui/icons";
+import { fullBleed, useSideInsets } from "@/components/ui/side-insets";
 import { StatusPage, statusTop } from "@/components/ui/status-page";
 import { tabBarBottom, tokens as t, type } from "@/theme/tokens";
 import type { ReactNode } from "react";
@@ -51,6 +52,7 @@ export function StoryDetailScreen({
   onExplore: () => void;
 }) {
   const insets = useSafeAreaInsets();
+  const side = useSideInsets(fullBleed);
   if (loading)
     return (
       <FlowPage onBack={onBack}>
@@ -98,16 +100,24 @@ export function StoryDetailScreen({
     );
   return (
     <View style={styles.outer}>
-      <View style={styles.screen}>
+      <View style={[styles.screen, fullBleed && styles.bleed]}>
         {backdrop}
-        <View style={[styles.header, { top: insets.top }]}>
+        <View
+          style={[
+            styles.header,
+            { top: insets.top, left: side.left, right: side.right },
+          ]}
+        >
           <Logo />
           <Pressable
             accessibilityRole="button"
             accessibilityLabel="뒤로"
             hitSlop={12}
             onPress={onBack}
-            style={styles.back}
+            style={[
+              styles.back,
+              { left: t.gutter + side.safeLeft - side.left },
+            ]}
           >
             <Icon name="caret-left" />
           </Pressable>
@@ -118,6 +128,8 @@ export function StoryDetailScreen({
             {
               top: insets.top + 63,
               bottom: tabBarBottom(insets.bottom) + 122,
+              left: t.gutter + side.left,
+              right: 18 + side.right,
             },
           ]}
         >
@@ -187,6 +199,7 @@ const styles = StyleSheet.create({
     backgroundColor: t.background,
     overflow: "hidden",
   },
+  bleed: { maxWidth: "100%" },
   header: {
     position: "absolute",
     left: 0,

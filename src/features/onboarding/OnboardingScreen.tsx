@@ -1,9 +1,17 @@
 import { Button } from "@/components/ui/button";
 import { Icon, Logo } from "@/components/ui/icons";
+import { useSideInsets } from "@/components/ui/side-insets";
 import { tokens as t, type } from "@/theme/tokens";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  useWindowDimensions,
+  View,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { episodes, type Cta, type EpisodeId, type SceneId } from "./episodes";
 import { FadeIn } from "./fade-in";
@@ -51,8 +59,20 @@ export function OnboardingScreen({
   onClose: () => void;
 }) {
   const insets = useSafeAreaInsets();
+  const side = useSideInsets();
   const current = episodes[episode][scene];
   const panel = scene === "afterglow" ? null : panels[episode][scene];
+  // 화면이 낮으면(접는 기기의 바깥·안쪽 화면 등) 패널을 줄여 문장이 버튼에 가리지 않게 합니다.
+  // 패널 이미지에는 투명 여백(좌우 24, 위 16, 아래 32)이 있어 축소 비율만큼 여백 보정도 줄입니다.
+  const window = useWindowDimensions();
+  const column = Math.min(window.width, t.maxWidth);
+  const ratio = tallPanel(episode, scene) ? 588 / 512 : 555 / 512;
+  const footer = current.ctas.length * 48 + (current.ctas.length - 1) * 12 + 24;
+  const titleHeight =
+    current.title.split("\n").length * type.heading.lineHeight;
+  const room =
+    window.height - insets.top - insets.bottom - 44 - footer - 61 - titleHeight;
+  const scale = Math.max(0.6, Math.min(1, room / (column * ratio - 48)));
   return (
     <View style={styles.outer}>
       {/* 여운은 사진 없이 바탕색만 둡니다(시안). */}
@@ -85,7 +105,7 @@ export function OnboardingScreen({
               accessibilityLabel="닫기"
               hitSlop={12}
               onPress={onClose}
-              style={styles.close}
+              style={[styles.close, { left: t.gutter + side.safeLeft }]}
             >
               <Icon name="close" />
             </Pressable>
@@ -105,18 +125,19 @@ export function OnboardingScreen({
                     source={panel}
                     contentFit="contain"
                     accessible={false}
-                    style={[
-                      styles.panel,
-                      {
-                        aspectRatio: tallPanel(episode, scene)
-                          ? 512 / 588
-                          : 512 / 555,
-                      },
-                    ]}
+                    style={{
+                      width: column * scale,
+                      aspectRatio: 1 / ratio,
+                      marginLeft: -t.gutter * scale,
+                      marginTop: 21 - 16 * scale,
+                    }}
                   />
                 </FadeIn>
                 <FadeIn delay={700}>
-                  <Text accessibilityRole="header" style={styles.title}>
+                  <Text
+                    accessibilityRole="header"
+                    style={[styles.title, { marginTop: 24 - 32 * scale }]}
+                  >
                     {current.title}
                   </Text>
                 </FadeIn>
@@ -167,9 +188,8 @@ const styles = StyleSheet.create({
   close: { position: "absolute", left: t.gutter },
   scroll: { flex: 1 },
   body: { flexGrow: 1, paddingHorizontal: t.gutter, paddingBottom: 16 },
-  // 시안: 패널이 헤더 아래 21pt, 제목은 패널 아래 24pt. 이미지의 투명 여백(위 16, 아래 32)만큼 빼서 맞춥니다.
-  panel: { marginHorizontal: -t.gutter, marginTop: 5 },
-  title: { ...type.heading, color: t.text, marginTop: -8 },
+  // 시안: 패널이 헤더 아래 21pt, 제목은 패널 아래 24pt. 여백 보정은 축소 비율과 함께 위에서 계산합니다.
+  title: { ...type.heading, color: t.text },
   // 시안: 라벨이 헤더 아래 148pt, 제목은 라벨 아래 17pt, 덧붙임은 제목 아래 23pt.
   afterglow: { paddingTop: 148 },
   label: { ...type.caption, color: t.muted },

@@ -11,6 +11,7 @@ import {
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Icon, Logo } from "./icons";
+import { useSideInsets } from "./side-insets";
 
 // TMX / Night / Header: 가운데 로고, 왼쪽은 뒤로(Back) 또는 닫기(Close), 오른쪽은 화면별 아이콘.
 export function FlowPage({
@@ -26,6 +27,7 @@ export function FlowPage({
   footer?: ReactNode;
 }>) {
   const insets = useSafeAreaInsets();
+  const side = useSideInsets();
   const leave = onBack ?? onClose;
   return (
     <KeyboardAvoidingView
@@ -46,12 +48,16 @@ export function FlowPage({
               accessibilityLabel={onBack ? "뒤로" : "닫기"}
               hitSlop={12}
               onPress={leave}
-              style={styles.left}
+              style={[styles.left, { left: t.gutter + side.safeLeft }]}
             >
               <Icon name={onBack ? "caret-left" : "close"} />
             </Pressable>
           )}
-          {right && <View style={styles.right}>{right}</View>}
+          {right && (
+            <View style={[styles.right, { right: t.gutter + side.safeRight }]}>
+              {right}
+            </View>
+          )}
         </View>
         <ScrollView
           keyboardShouldPersistTaps="handled"
