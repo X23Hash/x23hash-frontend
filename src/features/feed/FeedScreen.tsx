@@ -1,5 +1,7 @@
-import { ActionButton, Icon, IconButton } from "@/components/ui/feed-actions";
-import { tokens as t } from "@/theme/tokens";
+import { BellButton } from "@/components/ui/bell-button";
+import { Button } from "@/components/ui/button";
+import { Icon, Logo } from "@/components/ui/icons";
+import { tokens as t, type } from "@/theme/tokens";
 import { useFocusEffect } from "expo-router";
 import { useCallback, useRef, useState } from "react";
 import {
@@ -10,6 +12,7 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { FullStorySheet } from "./components/full-story-sheet";
 import { snapStart, StoryCard } from "./components/story-card";
 import type { Feed } from "./hooks/use-feed";
 import { initialScroll, updateScroll } from "./scroll-controls";
@@ -33,6 +36,9 @@ export function FeedScreen({
   const insets = useSafeAreaInsets();
   const [height, setHeight] = useState(812);
   const [hidden, setHidden] = useState(false);
+  // 03.02 전체보기 시트로 읽고 있는 글. 공감 상태가 바뀌어도 최신 값을 보이도록 ID만 보관합니다.
+  const [readingId, setReadingId] = useState<string | null>(null);
+  const reading = feed.items.find((item) => item.id === readingId) ?? null;
   const scroll = useRef(initialScroll);
   const listRef = useRef<FlatList<Story>>(null);
   const focused = useRef(true);
@@ -84,6 +90,7 @@ export function FeedScreen({
               onReact={onReact && (() => onReact(item))}
               onShare={onShare && (() => onShare(item))}
               onMore={onMore && (() => onMore(item))}
+              onReadAll={() => setReadingId(item.id)}
             />
           )}
           style={styles.list}
@@ -115,66 +122,60 @@ export function FeedScreen({
             scroll.current = next;
           }}
           ListEmptyComponent={
-            <View
-              style={[
-                styles.status,
-                {
-                  minHeight: height,
-                  paddingTop: insets.top + 120,
-                  paddingBottom: insets.bottom + 120,
-                },
-              ]}
-            >
-              {feed.loading ? (
-                <View style={styles.loading}>
-                  <ActivityIndicator
-                    accessibilityLabel="이야기 불러오는 중"
-                    color={t.muted}
-                  />
-                  <Text style={styles.description}>
-                    이야기를 불러오고 있어요.
-                  </Text>
+            feed.loading ? (
+              <View style={[styles.loading, { minHeight: height }]}>
+                <ActivityIndicator
+                  accessibilityLabel="마음 불러오는 중"
+                  color={t.muted}
+                />
+                <Text style={styles.description}>마음을 불러오고 있어요.</Text>
+              </View>
+            ) : (
+              // 03.06 마음 없음 · 03.07 불러오기 실패
+              <View style={[styles.status, { paddingTop: height * 0.337 }]}>
+                <View style={styles.statusIcon}>
+                  <Icon name={feed.error ? "retry" : "bookmark"} size={26} />
                 </View>
-              ) : (
-                <>
-                  <View style={styles.statusIcon}>
-                    <Icon
-                      name={feed.error ? "refresh" : "bookmark"}
-                      size={28}
-                    />
-                  </View>
-                  <Text accessibilityRole="header" style={styles.statusTitle}>
-                    {feed.error
-                      ? "이야기를\n불러오지 못했어요."
-                      : "아직 남겨진\n이야기가 없어요."}
-                  </Text>
-                  <Text style={styles.description}>
-                    {feed.error
-                      ? "연결을 확인하고 다시 시도해 주세요."
-                      : "첫 번째 마음을 남겨볼까요?\n당신의 이야기를 기다리고 있어요."}
-                  </Text>
-                  {feed.error && (
-                    <ActionButton label="다시 불러오기" onPress={feed.retry} />
-                  )}
-                </>
-              )}
-            </View>
+                <Text accessibilityRole="header" style={styles.statusTitle}>
+                  {feed.error
+                    ? "마음을\n불러오지 못했어요."
+                    : "아직 남겨진\n마음이 없어요."}
+                </Text>
+                {feed.error && (
+                  <>
+                    <Text style={styles.description}>
+                      연결을 확인하고 다시 시도해 주세요.
+                    </Text>
+                    <View style={styles.retry}>
+                      <Button
+                        small
+                        variant="secondary"
+                        label="다시 불러오기"
+                        onPress={feed.retry}
+                      />
+                    </View>
+                  </>
+                )}
+              </View>
+            )
           }
           ListFooterComponent={
             feed.items.length > 0 && (feed.loading || feed.error) ? (
               <View style={[styles.pagination, snapStart, { height }]}>
                 {feed.loading ? (
                   <ActivityIndicator
-                    accessibilityLabel="다음 이야기 불러오는 중"
+                    accessibilityLabel="다음 마음 불러오는 중"
                     color={t.text}
                   />
                 ) : (
                   <>
                     <Text style={styles.description}>
-                      다음 이야기를 불러오지 못했어요.
+                      다음 마음을 불러오지 못했어요.
                     </Text>
-                    <ActionButton
-                      label="다음 이야기 다시 불러오기"
+                    <Button
+                      small
+                      variant="secondary"
+                      label="다음 마음 다시 불러오기"
                       onPress={feed.retry}
                     />
                   </>
@@ -185,20 +186,22 @@ export function FeedScreen({
         />
         <View
           pointerEvents="box-none"
-          style={[styles.header, { top: insets.top + 22 }]}
+          style={[styles.header, { top: insets.top }]}
         >
-          <Text style={styles.brand}>*23#</Text>
+          <Logo />
           {!hidden && (
             <View style={styles.bell}>
-              <IconButton
-                icon="bell"
-                label={bellDot ? "알림 · 안 읽은 알림 있음" : "알림"}
-                badge={bellDot}
-                onPress={onBell}
-              />
+              <BellButton dot={bellDot} onPress={onBell} />
             </View>
           )}
         </View>
+        <FullStorySheet
+          story={reading}
+          onClose={() => setReadingId(null)}
+          onReact={onReact && reading ? () => onReact(reading) : undefined}
+          onShare={onShare && reading ? () => onShare(reading) : undefined}
+          onMore={onMore && reading ? () => onMore(reading) : undefined}
+        />
       </View>
     </View>
   );
@@ -214,42 +217,27 @@ const styles = StyleSheet.create({
   list: { flex: 1 },
   header: {
     position: "absolute",
-    left: t.gutter,
-    right: t.gutter,
-    height: 48,
+    left: 0,
+    right: 0,
+    height: 44,
     alignItems: "center",
     justifyContent: "center",
-  },
-  brand: {
-    color: t.text,
-    fontFamily: t.serif,
-    fontSize: 27,
-    fontWeight: "600",
   },
   bell: { position: "absolute", right: 0 },
-  status: { paddingHorizontal: t.gutter, justifyContent: "center", gap: 22 },
+  loading: { alignItems: "center", justifyContent: "center", gap: 16 },
+  status: { paddingHorizontal: t.gutter },
   statusIcon: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    borderWidth: 1,
-    borderColor: t.line,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: t.raised,
     alignItems: "center",
     justifyContent: "center",
+    marginBottom: 20,
   },
-  statusTitle: {
-    fontFamily: t.serif,
-    fontSize: 28,
-    lineHeight: 40,
-    color: t.text,
-  },
-  description: {
-    fontFamily: t.sans,
-    fontSize: 14,
-    lineHeight: 24,
-    color: t.muted,
-  },
-  loading: { alignItems: "center", gap: 16 },
+  statusTitle: { ...type.heading, color: t.text },
+  description: { ...type.guide, color: t.muted, marginTop: 12 },
+  retry: { marginTop: 20 },
   pagination: {
     padding: 24,
     paddingBottom: 130,

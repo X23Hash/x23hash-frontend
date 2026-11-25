@@ -75,6 +75,14 @@ export default function LoginRoute() {
   };
   return (
     <LoginScreen
+      // 글쓰기(기본 복귀 대상)와 피드의 공감·신고·차단은 시트, 알림·MY·설정에서의 진입은 전체 화면입니다.
+      entry={
+        !returnKey || returnKey === "write"
+          ? "write"
+          : returnKey === "feed"
+            ? "react"
+            : "page"
+      }
       phase={phase}
       failDetail={failDetail}
       kakaoEnabled={Platform.OS === "web" ? kakaoWebReady() : kakaoNativeReady()}

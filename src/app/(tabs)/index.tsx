@@ -4,7 +4,7 @@ import { createMockFeed } from "@/features/feed/api/mock-feed";
 import { FeedScreen } from "@/features/feed/FeedScreen";
 import { useFeed } from "@/features/feed/hooks/use-feed";
 import { scenarios, type FeedScenario, type Story } from "@/features/feed/types";
-import { getUnreadCount } from "@/features/notifications/api";
+import { useBellDot } from "@/features/notifications/use-bell-dot";
 import { loadProgress } from "@/features/onboarding/progress";
 import {
   blockAuthor,
@@ -52,20 +52,7 @@ export default function FeedRoute() {
   // 등록 성공 등 외부 변경의 피드 무효화 알림을 구독합니다.
   useEffect(() => subscribeFeedInvalidation(() => reloadRef.current()), []);
 
-  // 벨의 점은 서버 unreadCount > 0일 때만 표시합니다(게스트는 개인 API 호출 금지).
-  const [bellDot, setBellDot] = useState(false);
-  useEffect(() => {
-    if (!ready) return;
-    let active = true;
-    getUnreadCount()
-      .then((count) => {
-        if (active) setBellDot(count > 0);
-      })
-      .catch(() => {});
-    return () => {
-      active = false;
-    };
-  }, [ready]);
+  const bellDot = useBellDot(ready);
 
   // 게스트가 공감·신고·차단을 누르고 로그인한 뒤의 1회성 복귀 의도를 처리합니다.
   const intentHandled = useRef(false);
@@ -124,7 +111,7 @@ export default function FeedRoute() {
       <FeedScreen
         key={mockScenario ?? "live"}
         feed={feed}
-        bellDot={ready && bellDot}
+        bellDot={bellDot}
         onBell={() => router.push("/notifications")}
         onReact={onReact}
         onShare={(story) =>

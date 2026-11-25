@@ -22,6 +22,23 @@ export const listMyPosts = (cursor: string | null) =>
 export const getMyPost = (postId: string) =>
   api<PostView>(`/api/v1/me/posts/${postId}`, { auth: true });
 
+// v0.2 글 수정·삭제(Dev v0.2 D의 updatePost·deletePost). 서버에 아직 경로가 없어(2026-11-24 API 문서)
+// 조회와 같은 주소에 PATCH·DELETE를 보내는 가정이며, 서버가 확정하면 경로·형식을 맞춥니다.
+// operationId는 한 번의 시도에 하나를 만들어 재시도에도 같은 값을 씁니다.
+export const updatePost = (postId: string, body: string, operationId: string) =>
+  api<PostView>(`/api/v1/posts/${postId}`, {
+    method: "PATCH",
+    body: { body, operationId },
+    auth: true,
+  });
+
+export const deletePost = (postId: string, operationId: string) =>
+  api<void>(`/api/v1/posts/${postId}`, {
+    method: "DELETE",
+    body: { operationId },
+    auth: true,
+  });
+
 export const createPost = (body: string, submissionId: string) =>
   api<PostView>("/api/v1/posts", {
     method: "POST",

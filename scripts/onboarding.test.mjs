@@ -2,26 +2,29 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { episodeIds, episodes } from '../src/features/onboarding/episodes.ts';
 
-test('every episode has the five scenes and valid transitions', () => {
+test('every episode has the four scenes and valid transitions', () => {
+  const ending = [
+    { label: '이 마음 남기기', to: 'write' },
+    { label: '다른 마음 읽어보기', to: 'feed' },
+  ];
   for (const episode of episodeIds) {
     const scenes = episodes[episode];
-    assert.deepEqual(Object.keys(scenes).sort(), ['actionA', 'actionB', 'afterglow', 'choice', 'enter']);
+    assert.deepEqual(Object.keys(scenes).sort(), ['actionA', 'afterglow', 'choice', 'enter']);
     for (const scene of Object.values(scenes)) {
-      assert.ok(scene.ctas.length > 0 && scene.title && scene.lines.length > 0, `${scene.screen} content`);
-      for (const cta of scene.ctas) assert.ok(cta.to === 'write' || scenes[cta.to], `${scene.screen} → ${cta.to}`);
+      assert.ok(scene.ctas.length > 0 && scene.title, `${scene.screen} content`);
+      for (const cta of scene.ctas)
+        assert.ok(cta.to === 'write' || cta.to === 'feed' || scenes[cta.to], `${scene.screen} → ${cta.to}`);
     }
     assert.equal(scenes.enter.ctas[0].to, 'choice');
-    assert.deepEqual(scenes.choice.ctas.map(cta => cta.to), ['actionA', 'actionB']);
+    assert.deepEqual(scenes.choice.ctas.map(cta => cta.to), ['actionA', 'afterglow']);
     assert.equal(scenes.actionA.ctas[0].to, 'afterglow');
-    for (const scene of [scenes.actionB, scenes.afterglow]) {
-      assert.deepEqual(scene.ctas, [{ label: '이 마음 남기기', to: 'write' }]);
-      assert.equal(scene.prompt, true);
-    }
+    assert.deepEqual(scenes.afterglow.ctas, ending);
+    assert.ok(scenes.afterglow.label && scenes.afterglow.body, `${episode} afterglow copy`);
   }
 });
 
 test("progress persists, rejects corrupt data, rebuilds back path", async () => {
-  const { loadProgress, saveProgress, historyFor } = await import(
+  const { loadProgress, saveProgress, clearProgress, historyFor } = await import(
     "../src/features/onboarding/progress.ts"
   );
   // Node 25의 내장 localStorage는 백업 파일 없이는 동작하지 않으므로 메모리 경로를 검증합니다.
@@ -50,10 +53,22 @@ test("progress persists, rejects corrupt data, rebuilds back path", async () => 
     setItem: () => {},
   };
   assert.equal(loadProgress(), null, "corrupt json is ignored");
+  globalThis.localStorage = {
+    getItem: () => '{"episode":"jani","scene":"actionB","done":false}',
+    setItem: () => {},
+  };
+  assert.deepEqual(
+    loadProgress(),
+    { episode: "jani", scene: "afterglow", done: false },
+    "v0.1 actionB resumes at afterglow",
+  );
   delete globalThis.localStorage;
+  saveProgress({ episode: "kakao", scene: "choice", done: true });
+  clearProgress();
+  assert.equal(loadProgress(), null, "clear removes saved progress");
   assert.deepEqual(historyFor("enter"), []);
-  assert.deepEqual(historyFor("actionB"), ["enter", "choice"]);
-  assert.deepEqual(historyFor("afterglow"), ["enter", "choice", "actionA"]);
+  assert.deepEqual(historyFor("actionA"), ["enter", "choice"]);
+  assert.deepEqual(historyFor("afterglow"), ["enter", "choice"]);
 });
 
 test("progress survives an app restart through the registered device store", async () => {

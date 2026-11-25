@@ -78,3 +78,4 @@
 - iOS 앱 ID는 `6836202739`로 `eas.json`에 반영했습니다.
 - 2026-11-18 준비 완료: iOS 배포 인증서·프로비저닝(새 팀 `R4PW5MSL4D`)과 제출용 API 키, Android 키스토어와 Play 서비스 계정 키 연결·새 앱 권한, 첫 AAB 수동 업로드를 마쳤습니다. 로컬에서 실행한 `testing` 빌드와 제출이 두 플랫폼 모두 성공했습니다(iOS `ce934ee0` → TestFlight, Android `1144ffd0` → Play 내부 테스트). 빌드 ID와 과정은 [서비스 이름 변경](rebrand-x23hash.md)의 기록을 따릅니다.
 - 2026-11-18 CI 검증: main 반영(merge commit `a7d0e22`, Actions 44262897842)에서 `app-test` 작업이 두 플랫폼 모두 새 빌드·제출 경로로 성공했습니다(Android `dfd97326` versionCode 4, iOS `88c34033` 빌드 번호 4). 성공 기준 태그 두 개가 새 앱의 SHA·fingerprint·buildId로 갱신되고 pending이 null임을 확인했습니다. 다음 호환 변경의 OTA 분기와 새 앱의 설치·실행은 미확인입니다.
+- 2026-11-20 OTA 분기 검증: main 반영(merge commit `a292cbc`, Actions 44552703822)에서 fingerprint가 기준과 같아 두 플랫폼 모두 새 빌드 없이 testing 채널에 업데이트를 발행했습니다(iOS 그룹 `e85fadab`, 런타임 `6e6f7d83…` / Android 그룹 `8a7b030f`, 런타임 `a4d3ef0e…`). 성공 기준 태그는 SHA가 `a292cbc`로 바뀌고 buildId는 유지되며 update 기록이 추가됐습니다. 설치된 테스트 앱에 실제로 반영되는지는 미확인입니다.

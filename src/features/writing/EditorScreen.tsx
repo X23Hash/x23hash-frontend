@@ -1,102 +1,124 @@
-import { ActionButton } from "@/components/ui/feed-actions";
-import { FlowPage, flowStyles as f } from "@/components/ui/flow-page";
+import { Button } from "@/components/ui/button";
+import { FlowPage } from "@/components/ui/flow-page";
+import { Icon } from "@/components/ui/icons";
+import { StatusPage } from "@/components/ui/status-page";
+import { tokens as t, type } from "@/theme/tokens";
 import { useState } from "react";
-import { Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { BodyInput } from "./BodyInput";
 import { characters, validBody } from "./body-rules";
 import { useWritingSession } from "./writing-session";
 
+// 02.03 글쓰기 시작 · 02.05 빈 글 오류 · 02.06 긴 글 · 02.10 초안 이어쓰기 · 02.11 나가기 확인입니다.
 export function EditorScreen({
   onExit,
-  onPreview,
+  onSubmit,
   exitRequested,
   onKeepEditing,
 }: {
   onExit: () => void;
-  onPreview: () => void;
+  onSubmit: () => void;
   exitRequested: boolean;
   onKeepEditing: () => void;
 }) {
   const { draft, clear } = useWritingSession();
-  const [localPanel, setPanel] = useState<"editor" | "resume" | "reset">(
-    draft.body ? "resume" : "editor",
-  );
-  const panel = exitRequested ? "leave" : localPanel;
-  const edit = () => {
-    onKeepEditing();
-    setPanel("editor");
-  };
-  const count = characters(draft.body).length;
-  const close = onExit;
-  if (panel !== "editor")
+  const [resuming, setResuming] = useState(Boolean(draft.body));
+  // 빈 본문으로 남기기를 누른 뒤의 오류 표시. 입력하면 바로 사라집니다.
+  const [emptyError, setEmptyError] = useState(false);
+  const empty = draft.body.trim().length === 0;
+  const error = emptyError && empty;
+  if (exitRequested)
     return (
-      <FlowPage
-        title="이야기 쓰기"
-        onBack={() => (panel === "resume" ? onExit() : edit())}
+      <StatusPage
+        icon="pause"
+        title="잠시 쉬어갈까요?"
+        description={
+          "쓰던 마음은 초안으로 남겨둘게요.\n돌아오면 이어서 쓸 수 있어요."
+        }
       >
-        <Text style={f.title}>
-          {panel === "resume"
-            ? "이어서 쓰시겠어요?"
-            : panel === "reset"
-              ? "새로 시작하면 이전 초안이 삭제돼요."
-              : "잠시 마음을 쉬어갈까요?"}
-        </Text>
-        <Text style={f.muted}>
-          현재 실행 중인 앱에만 내용이 남아 있어요. 새로고침하거나 앱을 종료하면
-          사라집니다.
-        </Text>
-        {panel === "resume" ? (
-          <>
-            <ActionButton
-              label="이어서 쓰기"
-              onPress={() => setPanel("editor")}
-            />
-            <ActionButton
-              label="새로 시작하기"
-              onPress={() => setPanel("reset")}
-            />
-          </>
-        ) : panel === "reset" ? (
-          <>
-            <ActionButton
-              label="이전 초안 지우기"
-              onPress={() => {
-                clear();
-                setPanel("editor");
-              }}
-            />
-            <ActionButton label="취소" onPress={() => setPanel("resume")} />
-          </>
-        ) : (
-          <>
-            <ActionButton label="계속 작성하기" onPress={edit} />
-            <ActionButton label="나중에 쓰기" onPress={onExit} />
-          </>
-        )}
-      </FlowPage>
+        <Button label="계속 쓰기" onPress={onKeepEditing} />
+        <Button variant="secondary" label="나중에 쓰기" onPress={onExit} />
+      </StatusPage>
+    );
+  if (resuming)
+    return (
+      <StatusPage
+        icon="pen"
+        title={"쓰다 만\n마음이 있어요."}
+        description={
+          "쓰던 마음을 이어서 쓸까요?\n새로 시작하면 이전 초안은 사라져요."
+        }
+      >
+        <Button label="이어서 쓰기" onPress={() => setResuming(false)} />
+        <Button
+          variant="secondary"
+          label="새로 시작하기"
+          onPress={() => {
+            clear();
+            setResuming(false);
+          }}
+        />
+      </StatusPage>
     );
   return (
-    <FlowPage title="이야기 쓰기" onBack={close}>
-      <Text style={f.title}>
-        지금 떠오른 그 사람에게,{"\n"}남기지 못한 말을 적어보세요.
-      </Text>
-      <BodyInput />
-      <View style={f.group}>
-        <Text style={f.muted}>{count.toLocaleString()} / 1,000자</Text>
-        {count > 1000 && (
-          <Text accessibilityRole="alert" style={f.text}>
-            1,000자 이내로 적어주세요.
+    <FlowPage
+      onClose={onExit}
+      footer={
+        <View style={styles.footer}>
+          <Text style={styles.guide}>
+            익명으로 공개돼요. 실명·연락처는 적지 말아주세요.
           </Text>
-        )}
-        <Text style={f.muted}>
-          실명이나 연락처 등 개인정보는 적지 말아 주세요.
+          <Button
+            label="이대로 남기기"
+            disabled={error}
+            onPress={() => {
+              if (validBody(draft.body)) onSubmit();
+              else setEmptyError(true);
+            }}
+          />
+        </View>
+      }
+    >
+      <View>
+        <Text accessibilityRole="header" style={styles.title}>
+          그 사람에게{"\n"}하지 못한 말이 있나요?
         </Text>
-        <ActionButton
-          label="미리보기"
-          disabled={!validBody(draft.body)}
-          onPress={onPreview}
-        />
+        <BodyInput error={error} />
+        <Text style={styles.count}>
+          {characters(draft.body).length.toLocaleString()} / 1,000자
+        </Text>
+        <Text style={styles.label}>
+          배경 <Text style={styles.optional}> (선택)</Text>
+        </Text>
+        {/* 내 사진 배경(02.04)은 서버 업로드와 기기 사진 선택이 준비되면 연결합니다. 지금은 자리만 둡니다. */}
+        <View
+          accessibilityRole="button"
+          accessibilityLabel="배경 사진 추가"
+          accessibilityState={{ disabled: true }}
+          style={styles.photo}
+        >
+          <Icon name="image" size={20} />
+        </View>
       </View>
     </FlowPage>
   );
 }
+
+const styles = StyleSheet.create({
+  // 시안: 제목 위쪽이 헤더 아래 35pt(본문 여백 24 + 11), 입력창은 제목 아래 54pt.
+  title: { ...type.heading, color: t.text, marginTop: 11, marginBottom: 54 },
+  count: { ...type.caption, color: t.muted, marginTop: 11 },
+  label: { ...type.guide, color: t.text, marginTop: 40 },
+  optional: { color: t.muted },
+  photo: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    marginTop: 10,
+    backgroundColor: t.surface,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  footer: { paddingHorizontal: t.gutter, paddingBottom: t.gutter, gap: 16 },
+  guide: { ...type.caption, color: t.muted, textAlign: "center" },
+});

@@ -27,8 +27,18 @@ const failure = (status, code, message, result) => ({
 
 test("게시글 ID 기준 배경 배정은 같은 글에 항상 같은 배경을 준다", () => {
   const first = feedApi.backgroundFor("abc123");
-  assert.equal(feedApi.backgroundFor("abc123"), first);
-  assert.ok(["window", "cafe"].includes(first));
+  assert.deepEqual(feedApi.backgroundFor("abc123"), first);
+  assert.equal(first.type, "preset");
+  assert.ok(first.presetId >= 1 && first.presetId <= 6);
+  // 서버가 저장한 배경이 있으면 그 값을 씁니다.
+  assert.deepEqual(
+    feedApi.backgroundFor("abc123", { type: "preset", presetId: "04" }),
+    { type: "preset", presetId: 4 },
+  );
+  assert.deepEqual(
+    feedApi.backgroundFor("abc123", { type: "photo", imageUrl: "https://x/y.jpg" }),
+    { type: "photo", imageUrl: "https://x/y.jpg" },
+  );
   const story = feedApi.toStory({
     id: "p1",
     body: "본문",
@@ -40,7 +50,8 @@ test("게시글 ID 기준 배경 배정은 같은 글에 항상 같은 배경을
     reactionCount: 3,
     reacted: true,
   });
-  assert.equal(story.title, "요약");
+  assert.match(story.postedAt, /^2026\.11\.0[67]\. \d{2}:\d{2}$/);
+  assert.equal(story.background.type, "preset");
   assert.equal(story.reactionCount, 3);
   assert.equal(story.reacted, true);
 });
@@ -154,4 +165,28 @@ test("게스트 숨김은 등록된 기기 저장소에 남아 재시작 후에�
   hidden.clearHidden();
   assert.equal(disk.has("x23hash.hidden.v1"), false);
   registerDeviceStore(null);
+});
+
+test("MY 카드는 본문의 마지막 줄을 제목으로, 앞 줄들을 발췌로 쓴다", async () => {
+  const { cardLines } = await import("../src/features/my/card-lines.ts");
+  assert.deepEqual(
+    cardLines("별일 없이 하루를 보내다가\n문득 네 생각이 났어.\n\n그냥 잘 지내고 있으면 좋겠어."),
+    {
+      title: "그냥 잘 지내고 있으면 좋겠어.",
+      excerpt: "별일 없이 하루를 보내다가\n문득 네 생각이 났어.",
+    },
+  );
+  assert.deepEqual(cardLines("  한 줄뿐인 마음  "), { title: "한 줄뿐인 마음", excerpt: "" });
+  assert.deepEqual(cardLines(""), { title: "", excerpt: "" });
+});
+
+test("알림 시각은 방금 전·오늘·어제·날짜로 나뉜다", async () => {
+  const { formatRecent } = await import("../src/lib/format.ts");
+  const now = new Date(2026, 10, 25, 12, 0, 0);
+  const at = (...parts) => new Date(...parts).toISOString();
+  assert.equal(formatRecent(at(2026, 10, 25, 11, 55), now), "방금 전");
+  assert.equal(formatRecent(at(2026, 10, 25, 9, 0), now), "오늘");
+  assert.equal(formatRecent(at(2026, 10, 24, 23, 59), now), "어제");
+  assert.equal(formatRecent(at(2026, 10, 20, 9, 0), now), "2026.11.20");
+  assert.equal(formatRecent(null, now), "");
 });

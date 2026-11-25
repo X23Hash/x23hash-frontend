@@ -1,12 +1,15 @@
 import { BottomSheet } from "@/components/ui/bottom-sheet";
-import { ActionButton } from "@/components/ui/feed-actions";
-import { flowStyles as f } from "@/components/ui/flow-page";
+import { Button } from "@/components/ui/button";
+import { FlowPage } from "@/components/ui/flow-page";
+import { holdOverlay } from "@/components/ui/overlay-state";
+import { StatusPage, statusTop } from "@/components/ui/status-page";
 import { ApiError } from "@/lib/api";
 import type { ReportReason } from "@/features/posts/types";
-import { useState } from "react";
-import { Pressable, Text } from "react-native";
+import { tokens as t, type } from "@/theme/tokens";
+import { useEffect, useState, type PropsWithChildren } from "react";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
-// 07.01~07.08 공유·숨기기·신고·차단 시트. 실제 저장 동작은 라우트가 actions로 주입합니다.
+// 06.01–06.08 공유·더보기 시트와 숨기기·신고·차단 화면. 실제 저장 동작은 라우트가 actions로 주입합니다.
 export type SheetMode =
   | "share"
   | "copied"
@@ -53,7 +56,7 @@ export function StorySheets({
   storyId: string;
   shareUrl?: string;
   mode: SheetMode;
-  // 게스트의 신고·차단은 로그인(08.03)부터 진행하고, 숨김은 로컬 저장을 허용합니다.
+  // 게스트의 신고·차단은 로그인(07.03)부터 진행하고, 숨김은 로컬 저장을 허용합니다.
   guest?: boolean;
   onRequireLogin?: (intent: "report" | "block") => void;
   actions?: SheetActions;
@@ -77,7 +80,7 @@ export function StorySheets({
         onDone();
       })
       .catch((cause) => {
-        // 실패는 현재 시트와 선택을 보존합니다(07.04/07.06 규칙).
+        // 실패는 현재 화면과 선택을 보존합니다.
         setBusy(false);
         setError(errorText(cause));
       });
@@ -101,154 +104,236 @@ export function StorySheets({
     }
   };
   const failure = error && (
-    <Text accessibilityRole="alert" style={f.text}>
+    <Text accessibilityRole="alert" style={styles.failure}>
       {error}
     </Text>
   );
-  return (
-    <BottomSheet visible onClose={busy ? () => {} : onClose}>
-      {mode === "share" && (
-        <>
-          <Text accessibilityRole="header" style={f.title}>
-            이 마음을 나누고 싶다면
-          </Text>
-          <Text style={f.muted}>
-            글쓴이의 정보 없이, 공개된 이야기만 나눠요.
-          </Text>
-          {failure}
-          <ActionButton label="이야기 링크 복사" onPress={() => void copy()} />
-          <ActionButton label="닫기" onPress={onClose} />
-        </>
-      )}
-      {mode === "copied" && (
-        <>
-          <Text accessibilityRole="header" style={f.title}>
-            이야기 링크를 복사했어요.
-          </Text>
-          <Text style={f.muted}>대화창에 붙여 넣어 마음을 나눠보세요.</Text>
-          <ActionButton label="확인" onPress={onClose} />
-        </>
-      )}
-      {mode === "manage" && (
-        <>
-          <Text accessibilityRole="header" style={f.title}>
-            이 이야기
-          </Text>
-          <ActionButton
-            label="이 이야기 숨기기"
-            onPress={() => onChange("hide")}
-          />
-          <ActionButton
-            label="이 이야기 신고하기"
-            onPress={() =>
-              guest ? onRequireLogin?.("report") : onChange("report")
-            }
-          />
-          <ActionButton
-            label="이 작성자 차단하기"
-            onPress={() =>
-              guest ? onRequireLogin?.("block") : onChange("block")
-            }
-          />
-          <ActionButton label="닫기" onPress={onClose} />
-        </>
-      )}
-      {mode === "hide" && (
-        <>
-          <Text accessibilityRole="header" style={f.title}>
-            이 이야기를{"\n"}숨길까요?
-          </Text>
-          <Text style={f.muted}>
-            이 이야기가 내 스토리 목록에서 사라져요.{"\n"}글쓴이에게는 알려지지
-            않아요.
-          </Text>
-          {failure}
-          <ActionButton
+  // 06.04–06.08은 시안에서 시트가 아니라 전체 화면입니다. 피드 위를 덮고 하단 내비를 내립니다.
+  if (mode === "hide")
+    return (
+      <PageOverlay>
+        <StatusPage
+          top={statusTop.manage}
+          title={"이 마음을\n숨길까요?"}
+          description={
+            error ??
+            "이 마음이 내 스토리 목록에서 사라져요.\n글쓴이에게는 알려지지 않아요."
+          }
+        >
+          <Button
+            busy={busy}
             label={busy ? "숨기는 중…" : "숨기기"}
-            disabled={busy}
             onPress={() => run(actions?.hide, () => onChange("hidden"))}
           />
-          <ActionButton label="취소" disabled={busy} onPress={onClose} />
-        </>
-      )}
-      {mode === "hidden" && (
-        <>
-          <Text accessibilityRole="header" style={f.title}>
-            이 이야기를 숨겼어요.
-          </Text>
-          <Text style={f.muted}>다른 X의 마음을 만나보세요.</Text>
-          <ActionButton label="다른 이야기 보기" onPress={onClose} />
-        </>
-      )}
-      {mode === "report" && (
-        <>
-          <Text accessibilityRole="header" style={f.title}>
-            신고하는 이유를{"\n"}알려주세요.
-          </Text>
-          <Text style={f.muted}>신고한 사람의 정보는 전달되지 않아요.</Text>
-          {reasons.map((item) => (
-            <Pressable
-              key={item.code}
-              accessibilityRole="radio"
-              accessibilityState={{ selected: reason === item.code }}
-              onPress={() => setReason(item.code)}
-              style={{ paddingVertical: 10 }}
-            >
-              <Text style={f.text}>
-                {reason === item.code ? "●" : "○"} {item.label}
-              </Text>
-            </Pressable>
-          ))}
-          {failure}
-          <ActionButton
-            label={busy ? "접수하는 중…" : "신고 접수하기"}
-            disabled={!reason || busy}
-            onPress={() =>
-              reason &&
-              run(
-                actions &&
-                  (async () => {
-                    const receipt = await actions.report(reason);
-                    setAlreadyReported(receipt.alreadyReported);
-                  }),
-                () => onChange("reported"),
-              )
-            }
-          />
-          <ActionButton label="닫기" disabled={busy} onPress={onClose} />
-        </>
-      )}
-      {mode === "reported" && (
-        <>
-          <Text accessibilityRole="header" style={f.title}>
-            {alreadyReported
-              ? "이미 접수된 신고예요."
-              : "신고가 잘 접수됐어요."}
-          </Text>
-          <Text style={f.muted}>
-            보내 주신 내용을 확인한 뒤{"\n"}필요한 조치를 할게요.
-          </Text>
-          <ActionButton label="스토리로 돌아가기" onPress={onClose} />
-        </>
-      )}
-      {mode === "block" && (
-        <>
-          <Text accessibilityRole="header" style={f.title}>
-            이 작성자를{"\n"}차단할까요?
-          </Text>
-          <Text style={f.muted}>
-            이 작성자의 이야기가 목록에서 숨겨져요.{"\n"}차단 사실은 상대에게
-            알려지지 않아요.
-          </Text>
-          {failure}
-          <ActionButton
-            label={busy ? "차단하는 중…" : "차단하기"}
+          <Button
+            variant="secondary"
+            label="취소"
             disabled={busy}
+            onPress={onClose}
+          />
+        </StatusPage>
+      </PageOverlay>
+    );
+  if (mode === "hidden")
+    return (
+      <PageOverlay>
+        <StatusPage
+          icon="check"
+          top={statusTop.manage}
+          title="이 마음을 숨겼어요."
+        >
+          <Button label="다른 마음 읽어보기" onPress={onClose} />
+        </StatusPage>
+      </PageOverlay>
+    );
+  if (mode === "report")
+    return (
+      <PageOverlay>
+        <FlowPage
+          onBack={busy ? undefined : onClose}
+          footer={
+            <View style={styles.footer}>
+              <Button
+                busy={busy}
+                label={busy ? "접수하는 중…" : "신고 접수하기"}
+                disabled={!reason}
+                onPress={() =>
+                  reason &&
+                  run(
+                    actions &&
+                      (async () => {
+                        const receipt = await actions.report(reason);
+                        setAlreadyReported(receipt.alreadyReported);
+                      }),
+                    () => onChange("reported"),
+                  )
+                }
+              />
+            </View>
+          }
+        >
+          <View>
+            <Text style={styles.label}>REPORT</Text>
+            <Text accessibilityRole="header" style={styles.heading}>
+              신고하는 이유를{"\n"}알려주세요.
+            </Text>
+            <Text style={styles.guide}>
+              신고한 사람의 정보는 전달되지 않아요.
+            </Text>
+            <View accessibilityRole="radiogroup" style={styles.reasons}>
+              {reasons.map((item) => {
+                const selected = reason === item.code;
+                return (
+                  <Pressable
+                    key={item.code}
+                    accessibilityRole="radio"
+                    accessibilityState={{ selected, disabled: busy }}
+                    disabled={busy}
+                    onPress={() => setReason(item.code)}
+                    style={[styles.reason, selected && styles.reasonSelected]}
+                  >
+                    <Text style={styles.reasonText}>{item.label}</Text>
+                  </Pressable>
+                );
+              })}
+            </View>
+            {failure}
+          </View>
+        </FlowPage>
+      </PageOverlay>
+    );
+  if (mode === "reported")
+    return (
+      <PageOverlay>
+        <StatusPage
+          icon="check"
+          top={statusTop.manage}
+          title={
+            alreadyReported ? "이미 접수된 신고예요." : "신고를 접수했어요."
+          }
+          description={"보내주신 내용을 확인한 뒤\n필요한 조치를 할게요."}
+        >
+          <Button label="다른 마음 읽어보기" onPress={onClose} />
+        </StatusPage>
+      </PageOverlay>
+    );
+  if (mode === "block")
+    return (
+      <PageOverlay>
+        <StatusPage
+          top={statusTop.manage}
+          title={"이 작성자를\n차단할까요?"}
+          description={
+            error ??
+            "이 작성자의 마음이 목록에서 숨겨져요.\n차단 사실은 상대에게 알려지지 않아요."
+          }
+        >
+          <Button
+            variant="danger"
+            busy={busy}
+            label={busy ? "차단하는 중…" : "차단하기"}
             onPress={() => run(actions?.block, onClose)}
           />
-          <ActionButton label="취소" disabled={busy} onPress={onClose} />
+          <Button
+            variant="secondary"
+            label="취소"
+            disabled={busy}
+            onPress={onClose}
+          />
+        </StatusPage>
+      </PageOverlay>
+    );
+  return (
+    <BottomSheet visible onClose={onClose}>
+      {/* 05.08·06.01 공유 / 마음 링크 */}
+      {mode === "share" && (
+        <>
+          <Text accessibilityRole="header" style={styles.title}>
+            이 마음을 나누고 싶다면
+          </Text>
+          <Text style={styles.description}>
+            작성자 정보 없이,{"\n"}공개된 마음만 나눠요.
+          </Text>
+          {failure}
+          <View style={styles.buttons}>
+            <Button label="링크 복사" onPress={() => void copy()} />
+            <Button variant="secondary" label="닫기" onPress={onClose} />
+          </View>
+        </>
+      )}
+      {/* 05.09·06.02 공유 / 복사 완료 */}
+      {mode === "copied" && (
+        <>
+          <Text accessibilityRole="header" style={styles.title}>
+            링크를 복사했어요.
+          </Text>
+          <View style={styles.buttons}>
+            <Button label="확인" onPress={onClose} />
+          </View>
+        </>
+      )}
+      {/* 06.03 더보기 / 마음 관리 */}
+      {mode === "manage" && (
+        <>
+          <Text accessibilityRole="header" style={styles.title}>
+            이 마음
+          </Text>
+          <View style={styles.buttons}>
+            <Button
+              variant="secondary"
+              label="이 마음 숨기기"
+              onPress={() => onChange("hide")}
+            />
+            <Button
+              variant="dangerSecondary"
+              label="이 마음 신고하기"
+              onPress={() =>
+                guest ? onRequireLogin?.("report") : onChange("report")
+              }
+            />
+            <Button
+              variant="secondary"
+              label="이 작성자 차단하기"
+              onPress={() =>
+                guest ? onRequireLogin?.("block") : onChange("block")
+              }
+            />
+            <Button variant="secondary" label="닫기" onPress={onClose} />
+          </View>
         </>
       )}
     </BottomSheet>
   );
 }
+
+// 전체 화면 단계를 피드 위에 덮습니다. 떠 있는 동안 하단 내비를 내립니다.
+function PageOverlay({ children }: PropsWithChildren) {
+  useEffect(() => holdOverlay(), []);
+  return <View style={styles.page}>{children}</View>;
+}
+
+// 시안(05.08): 제목 아래 20pt에 설명, 그 아래 22pt에 버튼, 버튼 사이 16pt. 시트의 기본 간격 18에서 보정합니다.
+const styles = StyleSheet.create({
+  title: { ...type.dialogTitle, color: t.text },
+  description: { ...type.choice, color: t.muted, marginTop: 2 },
+  buttons: { gap: 16, marginTop: 4 },
+  failure: { ...type.guide, color: t.text, marginTop: 16 },
+  page: { position: "absolute", top: 0, right: 0, bottom: 0, left: 0, zIndex: 10 },
+  footer: { paddingHorizontal: t.gutter, paddingBottom: t.gutter },
+  // 06.06: 라벨이 헤더 아래 34pt, 제목 18pt 아래, 안내 22pt 아래, 첫 사유 20pt 아래.
+  label: { ...type.caption, color: t.muted, marginTop: 10 },
+  heading: { ...type.heading, color: t.text, marginTop: 18 },
+  guide: { ...type.guide, color: t.muted, marginTop: 22 },
+  reasons: { gap: 16, marginTop: 20 },
+  reason: {
+    height: 56,
+    paddingHorizontal: 20,
+    justifyContent: "center",
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: t.line,
+    backgroundColor: t.surface,
+  },
+  reasonSelected: { borderColor: t.text, backgroundColor: t.selected },
+  reasonText: { ...type.choice, color: t.text },
+});

@@ -7,14 +7,16 @@ export const scenarios = [
   "long-text",
 ] as const;
 export type FeedScenario = (typeof scenarios)[number];
-// 피드 카드 화면 모델. 제목은 서버 summary(본문 앞 20자 발췌)이고
-// 배경은 서버에 필드가 없어 글 ID 기준으로 고정 배정합니다(2026-11-07 사용자 결정).
+// 00-B 피드 배경. 사진이 있으면 사진, 없으면 프리셋 6종 중 하나입니다.
+export type Background =
+  | { type: "preset"; presetId: 1 | 2 | 3 | 4 | 5 | 6 }
+  | { type: "photo"; imageUrl: string };
+// 피드 카드 화면 모델(v0.2). 날짜는 표시용 문자열 "YYYY.MM.DD. HH:mm"입니다.
 export type Story = {
   id: string;
-  title: string;
   body: string;
-  metadata?: string;
-  background: "window" | "cafe";
+  postedAt: string;
+  background: Background;
   reactionCount: number;
   reacted: boolean;
   isMine: boolean;

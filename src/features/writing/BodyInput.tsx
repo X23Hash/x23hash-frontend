@@ -1,12 +1,15 @@
-import { tokens as t } from "@/theme/tokens";
+import { tokens as t, type } from "@/theme/tokens";
 import { TextInput } from "react-native";
 import { limitBody } from "./body-rules";
 import { useWritingSession } from "./writing-session";
-export function BodyInput() {
+// 02.03 안내 문구와 02.05 빈 글 오류 문구. 오류일 때는 테두리를 붉게, 문구를 밝게 보입니다.
+const placeholder = "그때 하지 못한 말,\n지금 남기고 싶은 말…";
+const emptyMessage = "남길 말을 입력해 주세요.";
+export function BodyInput({ error = false }: { error?: boolean }) {
   const { draft, update } = useWritingSession();
   return (
     <TextInput
-      accessibilityLabel="이야기 본문"
+      accessibilityLabel="남길 말"
       multiline
       scrollEnabled
       value={draft.body}
@@ -15,18 +18,17 @@ export function BodyInput() {
       onSelectionChange={(event) =>
         update({ selection: event.nativeEvent.selection })
       }
-      placeholder="그 사람에게 전하고 싶은 말이 있나요?"
-      placeholderTextColor={t.muted}
+      placeholder={error ? emptyMessage : placeholder}
+      placeholderTextColor={error ? t.text : t.muted}
       style={{
-        height: 300,
-        padding: 16,
+        height: 240,
+        padding: 20,
         borderWidth: 1,
-        borderColor: t.line,
-        borderRadius: 12,
+        borderColor: error ? t.danger : t.line,
+        borderRadius: 20,
+        backgroundColor: t.surface,
         color: t.text,
-        fontFamily: t.serif,
-        fontSize: 17,
-        lineHeight: 29,
+        ...type.body,
       }}
       textAlignVertical="top"
     />

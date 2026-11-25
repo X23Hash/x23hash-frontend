@@ -38,7 +38,7 @@
 | --- | --- | --- |
 | ScreenShell | 배경·safe area·본문 스크롤·키보드·하단 CTA 배치 | 전 화면 |
 | BrandHeader | `*23#` 제목, 뒤로·닫기·설정·알림의 화면별 조합 | 글쓰기·피드·MY·로그인 등 |
-| ActionButton | 주요·보조·위험 행동, 비활성·처리 중, 연속 탭 잠금 | 계속하기·공개·차단·탈퇴 |
+| Button(v0.2, 옛 ActionButton 대체) | 주요·보조·위험·위험 보조·글자 변형, 비활성·처리 중 | 계속하기·공개·차단·탈퇴 |
 | IconAction | 아이콘과 접근성 이름·선택 상태·누름 영역 | 공감·공유·더보기·소리·벨·+ |
 | ChoiceOption | 미선택·선택, 단일/다중 선택 의미 구분 | 시뮬레이션·신고·동의 |
 | StoryBodyInput | 본문·placeholder·카운터·오류·안내, 긴 글 스크롤 | 03.01·02·07·08 |
@@ -129,13 +129,18 @@
 
 화면·시트 모션: 전체 화면은 `FlowPage`의 reanimated FadeInDown 진입과 네이티브 스택 `slide_from_right` 전환, 시트는 `BottomSheet`·로그인 시트의 배경 FadeIn + SlideInDown(280ms, ease-out cubic, 바운스 없음)을 사용합니다. 스프링 바운스는 과하다는 사용자 피드백으로 제외했습니다. RN `Modal` 안에서는 reanimated 진입 애니메이션이 네이티브에서 실행되지 않아 `BottomSheet`는 Modal 대신 화면 위 오버레이로 그리며, 하드웨어 뒤로 가기 닫기는 아직 연결하지 않았습니다. 모션 시간·easing의 확정 값과 동작 줄이기(reduce motion) 대응은 디자인 토큰과 함께 추후 확정합니다.
 
-공통 구현은 `Icon`, `IconButton`, `ActionButton`과 2026-10-22 추가한 `FlowPage`(헤더·스크롤·푸터 골격), `BottomSheet`(배경 잠금 시트)입니다. 상태 화면·하단 탭·StoryCard는 피드 전용입니다. 기존 Expo 템플릿의 `constants/theme.ts`와 explore 화면은 유지하며 제품 토큰을 참조하지 않습니다. 템플릿 전환 시 정리합니다. 브랜드는 텍스트로 표시하고 아이콘은 SVG 선으로 작성했습니다. 최종 로고·아이콘 원본과의 일치 검수는 남아 있습니다.
+공통 구현은 `Icon`, `Button`(v0.2에서 옛 `ActionButton`을 대체, 2026-11-25 삭제), 2026-10-22 추가한 `FlowPage`(헤더·스크롤·푸터 골격), `BottomSheet`(배경 잠금 시트, v0.2 손잡이), v0.2에서 추가한 `StatusPage`(확인·완료·빈 상태 공통 구성), `CircleAction`, `BellButton`, `CheckCircle`입니다. 상태 화면·하단 탭·StoryCard는 피드 전용입니다. 기존 Expo 템플릿의 `constants/theme.ts`와 explore 화면은 유지하며 제품 토큰을 참조하지 않습니다. 템플릿 전환 시 정리합니다. 브랜드는 텍스트로 표시하고 아이콘은 SVG 선으로 작성했습니다. 최종 로고·아이콘 원본과의 일치 검수는 남아 있습니다.
 
 | 자산 | 경로·출처 | 사용 기준 |
 | --- | --- | --- |
 | MaruBuri Regular | `assets/fonts/MaruBuri-Regular.ttf`, [NAVER 공식 배포](https://hangeul.naver.com/hangeul_static/webfont/zips/maruburi.zip) | 제목·본문. [공식 사용 조건](https://help.naver.com/service/30016/contents/18088?osType=PC&lang=ko), SIL OFL 1.1 고지 동봉 |
 | Pretendard Regular | `assets/fonts/Pretendard-Regular.otf`, [공식 v1.3.9](https://github.com/orioncactus/pretendard/tree/v1.3.9) | 메타데이터·버튼. SIL OFL 1.1 원본 고지 동봉 |
-| window-night / cafe-night | `assets/images/feed/`, 자료 `2-04` PDF의 원본 임베디드 JPEG 추출 | mock 검수 전용. 공개 배포 전 권리·최종 원본 확인 필요 |
-| couple-sunset / x-portrait / bedroom-night | `assets/images/onboarding/`, 자료 `2-02` PDF의 원본 임베디드 JPEG 추출 | 온보딩 연출에 그대로 사용(사용자 채택). 공개 배포 전 권리·최종 원본 확인 필요 |
+| MaruBuri SemiBold | `assets/fonts/MaruBuri-SemiBold.ttf`, Regular와 같은 NAVER 공식 묶음(2026-11-24 추가) | v0.2 제목(Serif/Heading·Subhead). 고지는 기존 `MaruBuri-LICENSE.txt` |
+| Pretendard Medium · SemiBold | `assets/fonts/Pretendard-Medium.otf`·`Pretendard-SemiBold.otf`, [공식 v1.3.9](https://github.com/orioncactus/pretendard/tree/v1.3.9)(2026-11-24 추가) | v0.2 버튼·배지(Medium), 시트 제목(SemiBold). 고지는 기존 `Pretendard-LICENSE.txt` |
+| 아이콘 19종 · 로고 | `src/components/ui/icon-data.ts`, 사용자가 전달한 원본 SVG(`~/Desktop/ProjectData/x23hash/icon`·`LOGO.svg`, 2026-11-24) | v0.2 헤더·버튼 아이콘. 색은 `currentColor`로 바꿔 호출부가 지정. 토큰·컴포넌트 기준은 [v0.2 반영 계획](v02-update.md) |
+| 피드 배경 프리셋 6종 | `src/features/feed/components/story-background.tsx`, 사용자가 전달한 원본 SVG(`~/Desktop/ProjectData/x23hash/background`, 2026-11-24)의 색·위치 값 | v0.2 00-B. 사진 없는 글의 배경 |
+| 배경 질감 층 | `assets/images/feed/grain.png`(@2x), 전달받은 배경 SVG의 필터를 크롬으로 렌더해 질감만 추출(375×812 기준, 2026-11-24) | 원본의 SVG 필터(`feTurbulence`)를 네이티브에서 그릴 수 없어 이미지로 얹음. 6종의 필터가 같아 한 장을 공유 |
+| bedroom-night / cafe-drinks / bus-dusk | `assets/images/onboarding/`, bedroom-night은 자료 `2-02` PDF, 나머지 둘은 v0.2 UI 01 PDF의 원본 임베디드 JPEG 추출(2026-11-24) | 첫 방문 장면의 배경(카톡·인스타·자니 순). v0.1의 couple-sunset·x-portrait·`feed/cafe-night`·`feed/window-night`는 v0.2에서 쓰지 않아 삭제. 공개 배포 전 권리·최종 원본 확인 필요 |
+| 첫 방문 패널 9장 | `assets/images/onboarding/panels/`, 사용자가 전달한 원본 PNG(`~/Desktop/ProjectData/x23hash/simulation`, 2026-11-25에 512px 폭으로 다시 받음) | v0.2 UI 01의 카톡·인스타·메시지 연출 화면. 512×555(인스타 게시물만 512×588), 그림자용 투명 여백 포함. 3배 화면에서는 약간 부드럽게 보여 더 큰 원본을 받으면 교체 |
 
 폰트는 expo-font로 로드하고 실패 시 시스템 fallback으로 화면 진입을 허용합니다. 배경 명암은 expo-linear-gradient, 아이콘은 react-native-svg를 SDK 57 호환 버전으로 추가했습니다. 네이티브 개발용 앱은 추가된 모듈 반영을 위해 재빌드가 필요할 수 있습니다. 확인한 공식 문서는 [Font](https://docs.expo.dev/versions/v57.0.0/sdk/font/), [LinearGradient](https://docs.expo.dev/versions/v57.0.0/sdk/linear-gradient/), [SVG](https://docs.expo.dev/versions/v57.0.0/sdk/svg/)입니다.

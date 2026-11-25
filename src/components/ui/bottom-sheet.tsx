@@ -6,7 +6,12 @@ import {
   Platform,
   Pressable,
   StyleSheet,
+  View,
+  type StyleProp,
+  type ViewStyle,
 } from "react-native";
+
+import { holdOverlay } from "./overlay-state";
 
 const native = Platform.OS !== "web";
 
@@ -16,11 +21,18 @@ const native = Platform.OS !== "web";
 export function BottomSheet({
   visible,
   onClose,
+  style,
   children,
-}: PropsWithChildren<{ visible: boolean; onClose: () => void }>) {
+}: PropsWithChildren<{
+  visible: boolean;
+  onClose: () => void;
+  // 기본 여백·간격 대신 자체 배치를 쓰는 시트(예: 전체보기)가 덮어씁니다.
+  style?: StyleProp<ViewStyle>;
+}>) {
   const [backdrop] = useState(() => new Animated.Value(0));
   const [translateY] = useState(() => new Animated.Value(10000));
   const entered = useRef(false);
+  useEffect(() => (visible ? holdOverlay() : undefined), [visible]);
   useEffect(() => {
     if (visible) {
       Animated.timing(backdrop, {
@@ -54,7 +66,7 @@ export function BottomSheet({
       </Animated.View>
       <Animated.View
         accessibilityViewIsModal
-        style={[styles.sheet, { transform: [{ translateY }] }]}
+        style={[styles.sheet, style, { transform: [{ translateY }] }]}
         onLayout={(event) => {
           if (entered.current) return;
           entered.current = true;
@@ -67,6 +79,8 @@ export function BottomSheet({
           }).start();
         }}
       >
+        {/* 기본 시트에는 시안의 손잡이를 둡니다. 자체 배치 시트는 직접 그립니다. */}
+        {!style && <View style={styles.handle} />}
         {children}
       </Animated.View>
     </Animated.View>
@@ -84,5 +98,15 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 28,
     borderTopRightRadius: 28,
     backgroundColor: t.surface,
+  },
+  // 시안: 시트 위에서 29pt, 제목까지 16pt(여백 24·간격 18에서 보정).
+  handle: {
+    alignSelf: "center",
+    width: 40,
+    height: 4,
+    borderRadius: 2,
+    marginTop: 5,
+    marginBottom: -2,
+    backgroundColor: t.muted,
   },
 });

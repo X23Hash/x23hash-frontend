@@ -20,8 +20,16 @@ const Context = createContext<{
   submission: Submission | null;
   setSubmission: (submission: Submission | null) => void;
 } | null>(null);
-export function WritingSessionProvider({ children }: PropsWithChildren) {
-  const [draft, setDraft] = useState(empty);
+// initialBody: 글 수정(05.06)은 새 글 초안과 섞이지 않도록 기존 본문으로 시작하는 별도 세션을 씁니다.
+export function WritingSessionProvider({
+  initialBody = "",
+  children,
+}: PropsWithChildren<{ initialBody?: string }>) {
+  const [draft, setDraft] = useState<Draft>({
+    ...empty,
+    body: initialBody,
+    selection: { start: initialBody.length, end: initialBody.length },
+  });
   const [submission, setSubmission] = useState<Submission | null>(null);
   return (
     <Context.Provider

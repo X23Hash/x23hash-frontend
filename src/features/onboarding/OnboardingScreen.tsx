@@ -1,178 +1,179 @@
+import { Button } from "@/components/ui/button";
+import { Icon, Logo } from "@/components/ui/icons";
+import { tokens as t, type } from "@/theme/tokens";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { tokens as t } from "@/theme/tokens";
-import { episodes, type EpisodeId, type SceneId } from "./episodes";
+import { episodes, type Cta, type EpisodeId, type SceneId } from "./episodes";
 import { FadeIn } from "./fade-in";
-import { InstaCard } from "./cards/InstaCard";
-import { JaniCard } from "./cards/JaniCard";
-import { KakaoCard } from "./cards/KakaoCard";
-import { photos } from "./cards/pieces";
 
-const cards = { kakao: KakaoCard, insta: InstaCard, jani: JaniCard } as const;
+// 장면 뒤에 어둡게 깔리는 사진(시안 PDF의 원본 사진).
+const backgrounds = {
+  kakao: require("@/assets/images/onboarding/bedroom-night.jpg"),
+  insta: require("@/assets/images/onboarding/cafe-drinks.jpg"),
+  jani: require("@/assets/images/onboarding/bus-dusk.jpg"),
+} as const;
 
-// 시안의 CTA: 좌우 꽉 찬 알약형. 첫 번째는 크림 채움, 보조는 어두운 채움입니다.
-function CtaButton({
-  label,
-  primary,
-  onPress,
-}: {
-  label: string;
-  primary: boolean;
-  onPress: () => void;
-}) {
-  return (
-    <Pressable
-      accessibilityRole="button"
-      onPress={onPress}
-      style={({ pressed }) => [
-        styles.cta,
-        primary ? styles.ctaPrimary : styles.ctaSecondary,
-        pressed && { opacity: 0.75 },
-      ]}
-    >
-      <Text style={primary ? styles.ctaPrimaryText : styles.ctaSecondaryText}>
-        {label}
-      </Text>
-    </Pressable>
-  );
-}
+// 카톡·인스타·메시지 화면은 연출용 이미지입니다(사용자가 전달한 원본, 512×555·인스타 게시물만 512×588).
+// 패널 둘레에 그림자용 투명 여백(375pt 폭 기준 좌우 24, 위 16, 아래 32)이 포함돼 있어 화면 폭 전체로 깔아야 패널이 좌우 여백 24에 맞습니다.
+const panels = {
+  kakao: {
+    enter: require("@/assets/images/onboarding/panels/kakao-enter.png"),
+    choice: require("@/assets/images/onboarding/panels/kakao-choice.png"),
+    actionA: require("@/assets/images/onboarding/panels/kakao-action.png"),
+  },
+  insta: {
+    enter: require("@/assets/images/onboarding/panels/insta-enter.png"),
+    choice: require("@/assets/images/onboarding/panels/insta-choice.png"),
+    actionA: require("@/assets/images/onboarding/panels/insta-action.png"),
+  },
+  jani: {
+    enter: require("@/assets/images/onboarding/panels/jani-enter.png"),
+    choice: require("@/assets/images/onboarding/panels/jani-choice.png"),
+    actionA: require("@/assets/images/onboarding/panels/jani-action.png"),
+  },
+} as const;
+const tallPanel = (episode: EpisodeId, scene: SceneId) =>
+  episode === "insta" && scene === "actionA";
 
-// 시안(2-02) 구성: 어두운 배경 위 *23#, 상황 재현 패널(진입·선택·행동 A만),
-// 장면 라벨·서사, 하단 고정 프롬프트와 CTA 순서로 페이드 인합니다.
-// 뒤로 버튼은 시안에 없으며 시스템 뒤로만 직전 장면을 복원합니다(라우트에서 처리).
+// 01.01–01.12. 진입·선택·행동 A는 연출 패널 + 한 문장, 여운은 라벨·문장·덧붙임만 보입니다.
+// 표에 적힌 CTA만 동작하며 패널 안의 요소는 눌리지 않습니다.
 export function OnboardingScreen({
   episode,
   scene,
-  onAdvance,
-  onWrite,
+  onSelect,
+  onClose,
 }: {
   episode: EpisodeId;
   scene: SceneId;
-  onAdvance: (next: SceneId) => void;
-  onWrite: () => void;
+  onSelect: (to: Cta["to"]) => void;
+  onClose: () => void;
 }) {
   const insets = useSafeAreaInsets();
   const current = episodes[episode][scene];
-  const Card = cards[episode];
-  // B·여운 장면은 시안대로 패널 없이 배경과 서사만 보여줍니다.
-  const hasPanel =
-    scene === "enter" || scene === "choice" || scene === "actionA";
-  const narrationAt = hasPanel ? 700 : 300;
-  const ctaAt = narrationAt + 350 * (current.lines.length + 1);
+  const panel = scene === "afterglow" ? null : panels[episode][scene];
   return (
     <View style={styles.outer}>
-      <Image
-        source={photos.bedroom}
-        contentFit="cover"
-        accessible={false}
-        style={StyleSheet.absoluteFill}
-      />
-      <LinearGradient
-        colors={[
-          "rgba(13,11,8,0.82)",
-          "rgba(13,11,8,0.74)",
-          "rgba(13,11,8,0.95)",
-        ]}
-        style={StyleSheet.absoluteFill}
-      />
+      {/* 여운은 사진 없이 바탕색만 둡니다(시안). */}
+      {panel && (
+        <>
+          <Image
+            source={backgrounds[episode]}
+            contentFit="cover"
+            accessible={false}
+            style={StyleSheet.absoluteFill}
+          />
+          <LinearGradient
+            colors={["rgba(18,17,15,0.78)", "rgba(18,17,15,0.9)", t.background]}
+            locations={[0, 0.45, 0.7]}
+            style={StyleSheet.absoluteFill}
+          />
+        </>
+      )}
       <View
         style={[
           styles.page,
-          { paddingTop: insets.top + 18, paddingBottom: insets.bottom + 16 },
+          { paddingTop: insets.top, paddingBottom: insets.bottom },
         ]}
       >
-        <Text accessibilityRole="header" style={styles.brand}>
-          *23#
-        </Text>
+        <View style={styles.header}>
+          <Logo />
+          {panel && (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="닫기"
+              hitSlop={12}
+              onPress={onClose}
+              style={styles.close}
+            >
+              <Icon name="close" />
+            </Pressable>
+          )}
+        </View>
         <ScrollView
           showsVerticalScrollIndicator={false}
-          style={{ flex: 1 }}
+          style={styles.scroll}
           contentContainerStyle={styles.body}
         >
           {/* 장면이 바뀔 때마다 연출을 처음부터 다시 재생합니다. */}
-          <View
-            key={`${episode}-${scene}`}
-            testID={current.screen}
-            style={styles.scene}
-          >
-            {hasPanel ? (
-              <FadeIn duration={900}>
-                <Card scene={scene} />
-              </FadeIn>
-            ) : (
-              <View style={styles.topSpace} />
-            )}
-            <View style={styles.narration}>
-              <FadeIn delay={narrationAt}>
-                <Text style={styles.label}>{current.title}</Text>
-              </FadeIn>
-              {current.lines.map((line, index) => (
-                <FadeIn key={line} delay={narrationAt + 350 * (index + 1)}>
-                  <Text style={index === 0 ? styles.lead : styles.sub}>
-                    {line}
+          <View key={`${episode}-${scene}`} testID={current.screen}>
+            {panel ? (
+              <>
+                <FadeIn duration={900}>
+                  <Image
+                    source={panel}
+                    contentFit="contain"
+                    accessible={false}
+                    style={[
+                      styles.panel,
+                      {
+                        aspectRatio: tallPanel(episode, scene)
+                          ? 512 / 588
+                          : 512 / 555,
+                      },
+                    ]}
+                  />
+                </FadeIn>
+                <FadeIn delay={700}>
+                  <Text accessibilityRole="header" style={styles.title}>
+                    {current.title}
                   </Text>
                 </FadeIn>
-              ))}
-            </View>
-            <View style={styles.bottomSpace} />
-            {current.prompt && (
-              <FadeIn delay={ctaAt}>
-                <Text style={[styles.sub, styles.prompt]}>
-                  떠오른 말이 있다면, 여기 남겨보세요.
-                </Text>
-              </FadeIn>
+              </>
+            ) : (
+              <View style={styles.afterglow}>
+                <FadeIn delay={300}>
+                  <Text style={styles.label}>{current.label}</Text>
+                </FadeIn>
+                <FadeIn delay={650}>
+                  <Text
+                    accessibilityRole="header"
+                    style={[styles.title, styles.afterglowTitle]}
+                  >
+                    {current.title}
+                  </Text>
+                </FadeIn>
+                <FadeIn delay={1000}>
+                  <Text style={styles.sub}>{current.body}</Text>
+                </FadeIn>
+              </View>
             )}
-            <FadeIn delay={ctaAt + 200} style={styles.ctas}>
-              {current.ctas.map((cta, index) => (
-                <CtaButton
-                  key={cta.label}
-                  label={cta.label}
-                  primary={index === 0}
-                  onPress={() =>
-                    cta.to === "write" ? onWrite() : onAdvance(cta.to)
-                  }
-                />
-              ))}
-            </FadeIn>
           </View>
         </ScrollView>
+        <FadeIn
+          key={`${episode}-${scene}-ctas`}
+          delay={panel ? 1250 : 1550}
+          style={styles.ctas}
+        >
+          {current.ctas.map((cta, index) => (
+            <Button
+              key={cta.label}
+              variant={index === 0 ? "primary" : "secondary"}
+              label={cta.label}
+              onPress={() => onSelect(cta.to)}
+            />
+          ))}
+        </FadeIn>
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  outer: { flex: 1, backgroundColor: "#0d0b08", alignItems: "center" },
+  outer: { flex: 1, backgroundColor: t.background, alignItems: "center" },
   page: { flex: 1, width: "100%", maxWidth: t.maxWidth },
-  brand: {
-    color: t.text,
-    fontFamily: t.serif,
-    fontSize: 24,
-    fontWeight: "600",
-    textAlign: "center",
-    marginBottom: 16,
-  },
-  body: { flexGrow: 1, paddingHorizontal: t.gutter, paddingBottom: 8 },
-  scene: { flex: 1 },
-  topSpace: { flex: 0.8, minHeight: 90 },
-  narration: { gap: 14, paddingTop: 22 },
-  bottomSpace: { flex: 1, minHeight: 40 },
-  label: { color: t.muted, fontFamily: t.sans, fontSize: 12, letterSpacing: 1 },
-  lead: { color: t.text, fontFamily: t.serif, fontSize: 25, lineHeight: 38 },
-  sub: { color: "#cfc6b6", fontFamily: t.serif, fontSize: 15, lineHeight: 26 },
-  prompt: { marginBottom: 20 },
-  ctas: { gap: 12 },
-  cta: {
-    minHeight: 54,
-    borderRadius: 27,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: 20,
-  },
-  ctaPrimary: { backgroundColor: t.text },
-  ctaPrimaryText: { color: "#1b1813", fontFamily: t.sans, fontSize: 15, fontWeight: "600" },
-  ctaSecondary: { backgroundColor: "#262219" },
-  ctaSecondaryText: { color: t.text, fontFamily: t.sans, fontSize: 15 },
+  header: { height: 44, alignItems: "center", justifyContent: "center" },
+  close: { position: "absolute", left: t.gutter },
+  scroll: { flex: 1 },
+  body: { flexGrow: 1, paddingHorizontal: t.gutter, paddingBottom: 16 },
+  // 시안: 패널이 헤더 아래 21pt, 제목은 패널 아래 24pt. 이미지의 투명 여백(위 16, 아래 32)만큼 빼서 맞춥니다.
+  panel: { marginHorizontal: -t.gutter, marginTop: 5 },
+  title: { ...type.heading, color: t.text, marginTop: -8 },
+  // 시안: 라벨이 헤더 아래 148pt, 제목은 라벨 아래 17pt, 덧붙임은 제목 아래 23pt.
+  afterglow: { paddingTop: 148 },
+  label: { ...type.caption, color: t.muted },
+  afterglowTitle: { marginTop: 17 },
+  sub: { ...type.guide, color: t.muted, marginTop: 23 },
+  ctas: { paddingHorizontal: t.gutter, paddingBottom: t.gutter, gap: 12 },
 });

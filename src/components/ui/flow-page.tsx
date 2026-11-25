@@ -1,30 +1,32 @@
-import { tokens as t } from "@/theme/tokens";
+import { tokens as t, type } from "@/theme/tokens";
 import type { PropsWithChildren, ReactNode } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
+  Pressable,
   ScrollView,
   StyleSheet,
-  Text,
   View,
 } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { ActionButton } from "./feed-actions";
+import { Icon, Logo } from "./icons";
 
+// TMX / Night / Header: 가운데 로고, 왼쪽은 뒤로(Back) 또는 닫기(Close), 오른쪽은 화면별 아이콘.
 export function FlowPage({
-  title,
   onBack,
+  onClose,
   right,
   footer,
   children,
 }: PropsWithChildren<{
-  title: string;
   onBack?: () => void;
+  onClose?: () => void;
   right?: ReactNode;
   footer?: ReactNode;
 }>) {
   const insets = useSafeAreaInsets();
+  const leave = onBack ?? onClose;
   return (
     <KeyboardAvoidingView
       style={styles.outer}
@@ -37,10 +39,18 @@ export function FlowPage({
         ]}
       >
         <View style={styles.header}>
-          {onBack && <ActionButton label="뒤로" onPress={onBack} />}
-          <Text accessibilityRole="header" style={styles.heading}>
-            {title}
-          </Text>
+          <Logo />
+          {leave && (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={onBack ? "뒤로" : "닫기"}
+              hitSlop={12}
+              onPress={leave}
+              style={styles.left}
+            >
+              <Icon name={onBack ? "caret-left" : "close"} />
+            </Pressable>
+          )}
           {right && <View style={styles.right}>{right}</View>}
         </View>
         <ScrollView
@@ -60,17 +70,23 @@ export function FlowPage({
   );
 }
 export const flowStyles = StyleSheet.create({
-  title: { fontFamily: t.serif, fontSize: 26, lineHeight: 38, color: t.text },
-  text: { fontFamily: t.sans, fontSize: 15, lineHeight: 26, color: t.text },
-  muted: { fontFamily: t.sans, fontSize: 13, lineHeight: 22, color: t.muted },
+  title: { ...type.heading, color: t.text },
+  text: { ...type.choice, color: t.text },
+  muted: { ...type.guide, color: t.muted },
   group: { gap: 16 },
 });
 const styles = StyleSheet.create({
   outer: { flex: 1, backgroundColor: t.background, alignItems: "center" },
   page: { flex: 1, width: "100%", maxWidth: t.maxWidth },
-  header: { flexDirection: "row", alignItems: "center", gap: 24, padding: 20 },
-  right: { marginLeft: "auto" },
-  heading: { fontFamily: t.serif, fontSize: 20, color: t.text },
-  body: { flexGrow: 1, padding: 24, paddingBottom: 48 },
+  header: { height: 44, alignItems: "center", justifyContent: "center" },
+  left: { position: "absolute", left: t.gutter },
+  right: {
+    position: "absolute",
+    right: t.gutter,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 16,
+  },
+  body: { flexGrow: 1, padding: t.gutter, paddingBottom: 48 },
   animated: { flex: 1, gap: 24 },
 });
